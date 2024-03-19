@@ -1,0 +1,14 @@
+version: '3'
+services:
+  laravel-app:
+    container_name: laravel-core
+    image: laravel-core
+    platform: linux/amd64
+    build:
+      context: .
+    volumes:
+      - ./:/app
+    ports:
+      - '8000:8000'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

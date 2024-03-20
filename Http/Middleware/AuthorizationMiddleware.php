@@ -12,6 +12,7 @@ use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 use Ramsey\Uuid\Uuid;
+use UnexpectedValueException;
 
 final class AuthorizationMiddleware
 {

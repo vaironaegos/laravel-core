@@ -8,7 +8,7 @@ use Astrotech\Core\Base\Exception\RuntimeException;
 use Astrotech\Core\Base\Exception\ValidationException;
 use DateTimeImmutable;
 use Dyrynda\Database\Casts\EfficientUuid;
-use Dyrynda\Database\Support\GeneratesUuid;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +23,6 @@ abstract class ModelBase extends Model
 {
     use HasFactory;
     use HasEvents;
-    use GeneratesUuid;
 
     public const CREATED_BY = 'created_by';
     public const UPDATED_BY = 'updated_by';
@@ -40,10 +39,6 @@ abstract class ModelBase extends Model
      */
     protected $fillable = [
         'id'
-    ];
-
-    protected $casts = [
-        'id' => EfficientUuid::class,
     ];
 
     /**
@@ -370,5 +365,18 @@ abstract class ModelBase extends Model
             $query->whereNull('deleted_at');
         }
         return $query;
+    }
+
+    protected function id(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (empty($value)) {
+                    return $value;
+                }
+
+                return Uuid::fromBytes($value)->toString();
+            }
+        );
     }
 }

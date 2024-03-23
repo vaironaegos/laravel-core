@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Adapters;
 
-use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Illuminate\Support\Facades\Log;
+use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 
 final class LaravelLog implements LogSystem
 {

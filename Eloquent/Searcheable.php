@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Database\Eloquent\Builder;
 
 trait Searcheable
 {

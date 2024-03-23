@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Astrotech\Core\Laravel\Base\Http\HttpStatus;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Model;
+use Astrotech\Core\Laravel\Base\Http\HttpStatus;
 
 trait Read
 {

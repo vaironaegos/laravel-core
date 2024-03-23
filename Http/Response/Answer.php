@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Response;
 
-use Astrotech\Core\Laravel\Http\HttpStatus;
 use Throwable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 
 abstract class Answer
 {

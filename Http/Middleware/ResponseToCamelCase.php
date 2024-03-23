@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
-use Astrotech\Core\Laravel\Utils\KeyCaseConverter;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Astrotech\Core\Laravel\Utils\KeyCaseConverter;
 
 final class ResponseToCamelCase
 {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
+use Illuminate\Database\Eloquent\Model;
+use Astrotech\Core\Laravel\Http\Actions\Read;
 use Astrotech\Core\Laravel\Http\Actions\Create;
 use Astrotech\Core\Laravel\Http\Actions\Delete;
-use Astrotech\Core\Laravel\Http\Actions\Options;
-use Astrotech\Core\Laravel\Http\Actions\Read;
 use Astrotech\Core\Laravel\Http\Actions\Search;
 use Astrotech\Core\Laravel\Http\Actions\Update;
-use Illuminate\Database\Eloquent\Model;
+use Astrotech\Core\Laravel\Http\Actions\Options;
 
 abstract class CrudController extends ControllerBase
 {

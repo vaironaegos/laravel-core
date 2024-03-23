@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
-use App\Models\User;
 use Closure;
+use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Http\Request;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Http\Request;
 use UnexpectedValueException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 final class AuthorizationMiddleware
 {

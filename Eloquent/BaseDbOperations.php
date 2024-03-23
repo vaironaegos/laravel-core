@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Astrotech\Core\Base\Domain\Contracts\Entity;
 use Illuminate\Database\Eloquent\Builder;
+use Astrotech\Core\Base\Domain\Contracts\Entity;
 
 trait BaseDbOperations
 {

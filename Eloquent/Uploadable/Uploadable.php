@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent\Uploadable;
 
-use Astrotech\Core\Base\Exception\ValidationException;
 use Illuminate\Support\Facades\Storage;
+use Astrotech\Core\Base\Exception\ValidationException;
 
 trait Uploadable
 {

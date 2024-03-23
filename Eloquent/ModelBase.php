@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Astrotech\Core\Laravel\Eloquent\Casts\EfficientUuidCast;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Dyrynda\Database\Casts\EfficientUuid;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Astrotech\Core\Base\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -39,6 +38,10 @@ abstract class ModelBase extends Model
      */
     protected $fillable = [
         'id'
+    ];
+
+    protected $casts = [
+        'id' => EfficientUuidCast::class,
     ];
 
     /**
@@ -160,7 +163,7 @@ abstract class ModelBase extends Model
                     continue;
                 }
 
-                if ($caster !== EfficientUuid::class) {
+                if ($caster !== EfficientUuidCast::class) {
                     continue;
                 }
 
@@ -281,7 +284,7 @@ abstract class ModelBase extends Model
         if ($removeVirtuals || empty($attributes)) {
             return array_filter(
                 $attributes,
-                fn (string $fieldName) => !array_key_exists($fieldName, $this->virtualAttributes),
+                fn(string $fieldName) => !array_key_exists($fieldName, $this->virtualAttributes),
                 ARRAY_FILTER_USE_KEY
             );
         }
@@ -342,7 +345,7 @@ abstract class ModelBase extends Model
     {
         return array_filter(
             parent::toArray(),
-            fn (string $fieldName) => !str_contains($fieldName, "raw_"),
+            fn(string $fieldName) => !str_contains($fieldName, "raw_"),
             ARRAY_FILTER_USE_KEY
         );
     }
@@ -365,18 +368,5 @@ abstract class ModelBase extends Model
             $query->whereNull('deleted_at');
         }
         return $query;
-    }
-
-    protected function id(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value) {
-                if (empty($value)) {
-                    return $value;
-                }
-
-                return Uuid::fromBytes($value)->toString();
-            }
-        );
     }
 }

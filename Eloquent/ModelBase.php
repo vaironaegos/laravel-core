@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Eloquent;
 
 use Astrotech\Core\Laravel\Eloquent\Casts\EfficientUuidCast;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
@@ -111,7 +113,12 @@ abstract class ModelBase extends Model
 
     public function beforeSave(ModelBase $model): void
     {
-        if ($model->id === null || empty($model->id)) {
+        if (
+            in_array('id', Schema::getColumnListing($model->getTable()))
+            && $model->id === null
+            || in_array('id', Schema::getColumnListing($model->getTable()))
+            && empty($model->id)
+        ) {
             $model->id = Uuid::uuid4()->toString();
         }
     }

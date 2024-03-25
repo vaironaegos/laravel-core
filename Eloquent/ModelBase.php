@@ -111,6 +111,9 @@ abstract class ModelBase extends Model
 
     public function beforeSave(ModelBase $model): void
     {
+        if ($model->id === null || empty($model->id)) {
+            $model->id = Uuid::uuid4()->toString();
+        }
     }
 
     public function afterSave(ModelBase $model): void

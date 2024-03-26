@@ -8,6 +8,7 @@ use Closure;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
@@ -17,8 +18,8 @@ final class AuthorizationMiddleware
 {
     /**
      * Handle an incoming request.
-     * @param  \Illuminate\Http\Request $request
-     * @param  Closure $next
+     * @param \Illuminate\Http\Request $request
+     * @param Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)

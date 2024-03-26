@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Exception;
 
+use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Astrotech\Core\Base\Exception\ExceptionBase;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
 use Illuminate\Database\QueryException;
 use Throwable;
@@ -54,40 +56,71 @@ class ExceptionHandler extends LaravelHandlerException
 
     public function render($request, Throwable $e)
     {
+        /** @var LogSystem $logSystem */
+        $logSystem = app()->make(LogSystem::class);
+        $isProduction = app()->environment('production');
+
         $request->headers->set('Accept', 'application/json');
 
         if ($e instanceof ExceptionBase) {
-            return response()->json([
+            $response = [
                 'status' => 'fail',
                 'data' => $e->details(),
                 'meta' => [
                     'message' => $e->getMessage(),
-                    'trace' => !app()->environment('production') ? $e->getTrace() : []
+                    'trace' => !$isProduction ? $e->getTrace() : []
                 ],
-            ])->setStatusCode($e->getStatusCode());
+            ];
+
+            if ($isProduction) {
+                $logSystem->error($e->getMessage(), [
+                    'category' => get_class($e),
+                    'extraData' => $response
+                ]);
+            }
+
+            return response()->json($response)->setStatusCode($e->getStatusCode());
         }
 
         if ($e instanceof QueryException) {
-            return response()->json([
+            $response = [
                 'status' => 'error',
                 'data' => $e->getBindings(),
                 'meta' => [
                     'message' => $e->getMessage(),
                     'sql' => $e->getSql(),
-                    'trace' => !app()->environment('production') ? $e->getTrace() : []
+                    'trace' => !$isProduction ? $e->getTrace() : []
                 ],
-            ])->setStatusCode(500);
+            ];
+
+            if ($isProduction) {
+                $logSystem->error($e->getMessage(), [
+                    'category' => get_class($e),
+                    'extraData' => $response
+                ]);
+            }
+
+            return response()->json($response)->setStatusCode(500);
         }
 
-        return response()->json([
+        $response = [
             'status' => 'fail',
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'code' => $e->getCode(),
             'meta' => [
                 'message' => $e->getMessage(),
-                'trace' => !app()->environment('production') ? $e->getTrace() : []
+                'trace' => !$isProduction ? $e->getTrace() : []
             ],
-        ])->setStatusCode(400);
+        ];
+
+        if ($isProduction) {
+            $logSystem->error($e->getMessage(), [
+                'category' => get_class($e),
+                'extraData' => $response
+            ]);
+        }
+
+        return response()->json($response)->setStatusCode(400);
     }
 }

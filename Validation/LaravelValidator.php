@@ -44,7 +44,7 @@ final class LaravelValidator implements ValidatorInterface
                 throw new ValidationException([
                     'field' => $field,
                     'error' => underscoreToCamelCase(str_replace('.', '_', $message[0])),
-                    'value' => $values[$field]
+                    'value' => isset($values[$field]) ? $values[$field] : ''
                 ]);
             }
         }

@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Eloquent;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 trait Sorteable
 {
-    public function processSort(Builder $query, ?Request $request = null): void
+    public function processSort(Builder $query, string $sort = ''): void
     {
-        $request = $request ?? request();
-        $sort = $request->query('sort');
-
         if (empty($sort)) {
             return;
         }

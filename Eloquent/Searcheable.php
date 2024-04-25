@@ -7,7 +7,6 @@ namespace Astrotech\Core\Laravel\Eloquent;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -27,15 +26,11 @@ trait Searcheable
      * - btw (BETWEEN)
      *
      * @param Builder $query
-     * @param Request|null $request
      * @return void
      * @see https://www.yiiframework.com/doc/guide/2.0/en/rest-filtering-collections#filtering-request
      */
-    public function processSearch(Builder $query, ?Request $request = null): void
+    public function processSearch(Builder $query, array $filters = []): void
     {
-        $request = $request ?? request();
-        $filters = $request->query('filter');
-
         if (empty($filters)) {
             return;
         }
@@ -57,6 +52,7 @@ trait Searcheable
                         if ($hasRelation) {
                             if (count(explode('.', $column)) <= 2) {
                                 [$relation, $column] = explode('.', $column);
+                                $relation = underscoreToCamelCase($relation);
                                 $query->whereHas($relation, function (Builder $query) use ($operator, $value, $column) {
                                     $query->where($column, $operator->value, "%$value%");
                                 });
@@ -138,6 +134,7 @@ trait Searcheable
                 if ($hasRelation) {
                     if (count(explode('.', $column)) <= 2) {
                         [$relation, $column] = explode('.', $column);
+                        $relation = underscoreToCamelCase($relation);
                         $query->whereHas($relation, function (Builder $query) use ($param, $column) {
                             $value = isUuidString($param) ? Uuid::fromString($param)->getBytes() : $param;
                             $query->where($column, $value);
@@ -162,7 +159,10 @@ trait Searcheable
 
                 $value = isUuidString($param) ? Uuid::fromString($param)->getBytes() : $param;
                 $query->where($column, $value);
+                continue;
             }
+
+            $query->where($column, $param);
         }
     }
 }

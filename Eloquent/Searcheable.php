@@ -88,6 +88,25 @@ trait Searcheable
                     }
 
                     if ($operator === SearchOperator::BETWEEN) {
+                        if ($hasRelation) {
+                            $dates = explode(',', $value);
+                            $date1 = "$dates[0] 00:00:00";
+                            if (!isset($dates[1])) {
+                                $date2 = "$dates[0] 23:59:59";
+                            } else {
+                                $date2 = "$dates[1] 23:59:59";
+                            }
+
+                            if (count(explode('.', $column)) <= 2) {
+                                [$relation, $column] = explode('.', $column);
+                                $relation = underscoreToCamelCase($relation);
+                                $query->whereHas($relation, function (Builder $query) use ($date1, $date2, $column) {
+                                    $query->whereBetween($column, [$date1, $date2]);
+                                });
+                                continue;
+                            }
+                        }
+
                         $dates = explode(',', $value);
                         if (strlen($dates[0]) === 7) {
                             $month1 = new DateTimeImmutable($dates[0]);

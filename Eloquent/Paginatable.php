@@ -14,6 +14,7 @@ trait Paginatable
     public function buildPagination(Builder $query, int $perPage = 40): void
     {
         $request = $request ?? request();
+
         if ($request->query('skipPagination') || $request->query('limit')) {
             $query->get()->each(fn ($row) => $this->data[] = $row->toSoftArray());
             $this->paginationData = [];
@@ -33,7 +34,7 @@ trait Paginatable
             'current' => $paginate->currentPage(),
             'perPage' => $paginate->perPage(),
             'pagesCount' => ceil($count / $paginate->perPage()),
-            'recordsCount' => $paginate->total(),
+            'recordsCount' => $paginate->count(),
             'count' => $count
         ];
     }

@@ -7,7 +7,7 @@ namespace Astrotech\Core\Laravel\Adapters\Contracts;
 interface MailService
 {
     /**
-     * Send mail to user from Laravel Template
+     * Send mail to a user
      * @param string $to
      * @param string $templateName
      * @param array $params

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Adapters;
 
-use Astrotech\Core\Laravel\Adapters\Contracts\MailService;
 use Illuminate\Support\Facades\Mail;
+use Astrotech\Core\Laravel\Adapters\Contracts\MailService;
 
 final class LaravelMailService implements MailService
 {

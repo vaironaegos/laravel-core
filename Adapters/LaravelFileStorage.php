@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Astrotech\Core\Laravel\Adapters;
 
 use Astrotech\Core\Base\Adapter\Contracts\FileStorage;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Validation;
 
-use Astrotech\Core\Base\Adapter\Contracts\ValidatorInterface;
 use Astrotech\Core\Base\Exception\ValidationException;
+use Astrotech\Core\Base\Adapter\Contracts\ValidatorInterface;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 
 final class LaravelValidator implements ValidatorInterface

@@ -6,7 +6,6 @@ namespace Astrotech\Core\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 final class Cors
 {

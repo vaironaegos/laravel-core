@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Exception;
 
-use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
-use Astrotech\Core\Base\Exception\ExceptionBase;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
-use Illuminate\Database\QueryException;
 use Throwable;
+use Illuminate\Database\QueryException;
+use Astrotech\Core\Base\Exception\ExceptionBase;
+use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
+use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
 
 class ExceptionHandler extends LaravelHandlerException
 {
     /**
      * A list of exception types with their corresponding custom log levels.
      *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
+     * @var array<class-string<Throwable>, \Psr\Log\LogLevel::*>
      */
     protected $levels = [
         //
@@ -25,7 +24,7 @@ class ExceptionHandler extends LaravelHandlerException
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array<int, class-string<\Throwable>>
+     * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
         //

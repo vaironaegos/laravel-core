@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Astrotech\Core\Laravel\Eloquent\Casts\EfficientUuidCast;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -19,6 +17,7 @@ use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Astrotech\Core\Laravel\Eloquent\Casts\EfficientUuidCast;
 
 abstract class ModelBase extends Model
 {
@@ -294,7 +293,7 @@ abstract class ModelBase extends Model
         if ($removeVirtuals || empty($attributes)) {
             return array_filter(
                 $attributes,
-                fn(string $fieldName) => !array_key_exists($fieldName, $this->virtualAttributes),
+                fn (string $fieldName) => !array_key_exists($fieldName, $this->virtualAttributes),
                 ARRAY_FILTER_USE_KEY
             );
         }
@@ -355,7 +354,7 @@ abstract class ModelBase extends Model
     {
         return array_filter(
             parent::toArray(),
-            fn(string $fieldName) => !str_contains($fieldName, "raw_"),
+            fn (string $fieldName) => !str_contains($fieldName, "raw_"),
             ARRAY_FILTER_USE_KEY
         );
     }

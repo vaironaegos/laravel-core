@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Console\Commands;
 
-use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
-use Astrotech\Core\Base\Adapter\Contracts\QueueSystem;
-use Astrotech\Core\Base\Infra\ConsumerBase;
 use LogicException;
 use Illuminate\Console\Command;
 use PhpAmqpLib\Message\AMQPMessage;
+use Astrotech\Core\Base\Infra\ConsumerBase;
+use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
+use Astrotech\Core\Base\Adapter\Contracts\QueueSystem;
 
 final class ConsumeQueue extends Command
 {
@@ -44,7 +44,7 @@ final class ConsumeQueue extends Command
             }
         }
 
-        $this->queueSystem->consume($this->queue, fn(AMQPMessage $message) => $this->processMessage($message));
+        $this->queueSystem->consume($this->queue, fn (AMQPMessage $message) => $this->processMessage($message));
 
         $channel = $this->queueSystem->getChannel();
         while ($channel->is_consuming()) {

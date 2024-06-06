@@ -8,10 +8,10 @@ use Closure;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Firebase\JWT\SignatureInvalidException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
+use Firebase\JWT\SignatureInvalidException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 final class AuthorizationMiddleware

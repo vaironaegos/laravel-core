@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Astrotech\Core\Laravel\Eloquent\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 class EfficientUuidCast implements CastsAttributes
 {

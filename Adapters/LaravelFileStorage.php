@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Adapters;
 
 use Astrotech\Core\Base\Adapter\Contracts\FileStorage;
+use Illuminate\Support\Facades\Storage;
 
 class LaravelFileStorage implements FileStorage
 {
@@ -23,5 +24,16 @@ class LaravelFileStorage implements FileStorage
         $file->storeAs($destinationPath, $fileName, 'public');
 
         return $fileName;
+    }
+
+    public function delete(string $destinationPathWithFileName): bool
+    {
+        $disk = Storage::disk('public');
+
+        if ($disk->exists($destinationPathWithFileName)) {
+            return $disk->delete($destinationPathWithFileName);
+        }
+
+        return false;
     }
 }

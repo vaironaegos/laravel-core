@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Adapters;
 
-use Astrotech\Core\Base\Adapter\Contracts\FileStorage;
 use Illuminate\Support\Facades\Storage;
+use Astrotech\Core\Base\Adapter\Contracts\FileStorage;
 
 class LaravelFileStorage implements FileStorage
 {

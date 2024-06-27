@@ -28,7 +28,8 @@ final class Router extends Route
             if (!method_exists($controllerName, $method)) {
                 continue;
             }
-            static::$verb($path, "{$controllerName}@{$method}")->middleware("permission:{$method},{$uri}");
+            //static::$verb($path, "{$controllerName}@{$method}")->middleware("permission:{$method},{$uri}");
+            static::$verb($path, "{$controllerName}@{$method}");
         }
     }
 }

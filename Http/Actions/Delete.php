@@ -9,13 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
 use Astrotech\Core\Base\Infra\Http\HttpStatus;
+use Ramsey\Uuid\Uuid;
 
 trait Delete
 {
     public function delete(Request $request, string $id): JsonResponse
     {
         $modelName = $this->modelClassName();
-        $query = $modelName::whereUuid($id);
+        $query = $modelName::where('id', Uuid::fromString($id)->getBytes());
 
         /** @var Model $record */
         $record = $query->first();

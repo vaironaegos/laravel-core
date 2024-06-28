@@ -31,7 +31,6 @@ trait Search
         $this->processSort($query);
         $this->buildPagination($query);
 
-
         return $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData
         ]);

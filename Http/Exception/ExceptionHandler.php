@@ -6,6 +6,7 @@ namespace Astrotech\Core\Laravel\Http\Exception;
 
 use Throwable;
 use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Astrotech\Core\Base\Exception\ExceptionBase;
 use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
@@ -100,6 +101,35 @@ class ExceptionHandler extends LaravelHandlerException
             }
 
             return response()->json($response)->setStatusCode(500);
+        }
+
+        if ($e instanceof ValidationException) {
+            $data = [];
+
+            foreach ($e->validator->failed() as $fieldName => $errors) {
+                foreach ($errors as $validatorName => $a) {
+                    $data[] = ['field' => $fieldName, 'error' => strtolower($validatorName)];
+                }
+            }
+
+            $response = [
+                'status' => 'fail',
+                'data' => $data,
+                'meta' => [
+                    'errors' => $e->errors(),
+                    'message' => $e->getMessage(),
+                    'trace' => !$isProduction ? $e->getTrace() : []
+                ],
+            ];
+
+            if ($isProduction) {
+                $logSystem->error($e->getMessage(), [
+                    'category' => get_class($e),
+                    'extraData' => $response
+                ]);
+            }
+
+            return response()->json($response)->setStatusCode($e->status);
         }
 
         $response = [

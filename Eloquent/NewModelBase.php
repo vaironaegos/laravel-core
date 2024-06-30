@@ -92,6 +92,11 @@ abstract class NewModelBase extends Model
         static::deleting($beforeDeleteCallback);
     }
 
+    public function getIdAttribute()
+    {
+        return $this->attributes['external_id'];
+    }
+
     public function afterSave(ModelBase $model): void
     {
     }

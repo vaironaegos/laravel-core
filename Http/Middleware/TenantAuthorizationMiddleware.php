@@ -9,6 +9,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
@@ -34,9 +35,17 @@ final class TenantAuthorizationMiddleware
             $token = trim(explode(' ', $token)[1]);
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
 
+            if (containsAnySubstring($request->getRequestUri(), ['signIn', 'sign-in', 'sign_in'])) {
+                $tenantData = new stdClass();
+                $tenantData->id = $payload->sub;
+                $tenantData->name = $payload->name;
+                $tenantData->schema = $payload->schema;
+                $payload->tenant = $tenantData;
+            }
+
             $tenant = DB::table('public.tenants')
                 ->select(['external_id as id', 'name', 'schema', 'url'])
-                ->where(['external_id' => $payload->sub, 'active' => 1])
+                ->where(['external_id' => $payload->tenant->id, 'active' => 1])
                 ->first();
 
             if (!$tenant) {

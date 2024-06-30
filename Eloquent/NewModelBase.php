@@ -45,11 +45,9 @@ abstract class NewModelBase extends Model
         $beforeSaveCallback = function (self $model) {
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
-            $this->attributes = $model->getRecordAttributes();
+            $this->attributes = $model->getAttributes();
             $rules = $model->getRules();
             $validator = Validator::make($this->attributes, $rules);
-
-            $this->beforeSave($model);
 
             if (!$validator->fails()) {
                 return;
@@ -66,7 +64,7 @@ abstract class NewModelBase extends Model
         };
 
         $afterSaveCallback = function (self $model) {
-            $model->attributes = $model->getRecordAttributes(false);
+            $model->attributes = $model->getAttributes();
             $this->afterSave($model);
         };
 
@@ -97,11 +95,11 @@ abstract class NewModelBase extends Model
         return $this->attributes['external_id'];
     }
 
-    public function afterSave(ModelBase $model): void
+    public function afterSave(NewModelBase $model): void
     {
     }
 
-    public function beforeDelete(ModelBase $model): void
+    public function beforeDelete(NewModelBase $model): void
     {
     }
 

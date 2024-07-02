@@ -27,7 +27,7 @@ trait Search
         $query = $modelName::query();
         $query->whereNull('deleted_at');
 
-        $this->processSearch($query);
+        $this->processSearch($query, $request->get('filter'));
         $this->processSort($query);
         $this->buildPagination($query);
 

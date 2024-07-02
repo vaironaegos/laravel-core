@@ -42,6 +42,8 @@ abstract class NewModelBase extends Model
 
     public function __construct(array $attributes = [])
     {
+        $this->populateFillableFields();
+        $this->populateRulesFields();
         $this->construct();
         parent::__construct($attributes);
 
@@ -95,6 +97,10 @@ abstract class NewModelBase extends Model
 
     protected function beforeSave(NewModelBase $model): void
     {
+        if (!empty($model->getAttribute('id'))) {
+            return;
+        }
+
         $model->external_id = Uuid::uuid4()->toString();
     }
 
@@ -283,5 +289,66 @@ abstract class NewModelBase extends Model
         }
 
         return $relations;
+    }
+
+    protected function returnOnlyFields(array $fieldsToReturn): array
+    {
+        return array_filter($this->toArray(), function ($key) use ($fieldsToReturn) {
+            return in_array($key, $fieldsToReturn);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    private function populateFillableFields(): void
+    {
+        if ($this->hasModelAttribute(static::CREATED_AT)) {
+            $this->fillable[] = static::CREATED_AT;
+        }
+
+        if ($this->hasModelAttribute(static::CREATED_BY)) {
+            $this->fillable[] = static::CREATED_BY;
+        }
+
+        if ($this->hasModelAttribute(static::UPDATED_AT)) {
+            $this->fillable[] = static::UPDATED_AT;
+        }
+
+        if ($this->hasModelAttribute(static::UPDATED_BY)) {
+            $this->fillable[] = static::UPDATED_BY;
+        }
+
+        if ($this->hasModelAttribute(static::DELETED_AT)) {
+            $this->fillable[] = static::DELETED_AT;
+        }
+
+        if ($this->hasModelAttribute(static::DELETED_BY)) {
+            $this->fillable[] = static::DELETED_BY;
+        }
+    }
+
+    private function populateRulesFields(): void
+    {
+        if ($this->hasModelAttribute(static::CREATED_AT)) {
+            $this->rules[static::CREATED_AT] = ['required', 'date'];
+        }
+
+        if ($this->hasModelAttribute(static::CREATED_BY)) {
+            $this->rules[static::CREATED_BY] = ['required', 'string'];
+        }
+
+        if ($this->hasModelAttribute(static::UPDATED_AT)) {
+            $this->rules[static::UPDATED_AT] = ['nullable', 'date'];
+        }
+
+        if ($this->hasModelAttribute(static::UPDATED_BY)) {
+            $this->rules[static::UPDATED_BY] = ['nullable', 'string'];
+        }
+
+        if ($this->hasModelAttribute(static::DELETED_AT)) {
+            $this->rules[static::DELETED_AT] = ['nullable', 'date'];
+        }
+
+        if ($this->hasModelAttribute(static::DELETED_BY)) {
+            $this->rules[static::DELETED_BY] = ['nullable', 'string'];
+        }
     }
 }

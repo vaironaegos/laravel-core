@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
+use Astrotech\Core\Laravel\Http\Actions\NewDelete;
+use Astrotech\Core\Laravel\Http\Actions\NewOptions;
+use Astrotech\Core\Laravel\Http\Actions\NewRead;
+use Astrotech\Core\Laravel\Http\Actions\NewUpdate;
 use Illuminate\Database\Eloquent\Model;
-use Astrotech\Core\Laravel\Http\Actions\Read;
 use Astrotech\Core\Laravel\Http\Actions\Create;
-use Astrotech\Core\Laravel\Http\Actions\Delete;
 use Astrotech\Core\Laravel\Http\Actions\NewSearch;
-use Astrotech\Core\Laravel\Http\Actions\Update;
-use Astrotech\Core\Laravel\Http\Actions\Options;
 
 abstract class NewCrudController extends ControllerBase
 {
     use Create;
-    use Read;
-    use Update;
-    use Delete;
+    use NewRead;
+    use NewUpdate;
+    use NewDelete;
     use NewSearch;
-    use Options;
+    use NewOptions;
 
     protected array $requestFields = [];
 

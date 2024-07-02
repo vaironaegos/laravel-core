@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Astrotech\Core\Laravel\Eloquent\ModelBase;
 
-trait Options
+trait NewOptions
 {
     public function options(Request $request): JsonResponse
     {
-        $value = $request->get('value', 'id');
+        $value = $request->get('value', 'external_id');
         $label = $request->get('label');
 
         if (is_null($label)) {
@@ -26,15 +25,10 @@ trait Options
         $model = new $modelName();
 
         $rows = DB::select(
-            "select `{$value}` as `value`, `{$label}` as `label`
-            from `{$model->getTable()}`
-            order by `{$label}` ASC"
+            "select {$value} as value, {$label} as label
+            from {$model->getTable()}
+            order by {$label} ASC"
         );
-
-        $rows = array_map(function ($row) {
-            $row->value = Uuid::fromBytes($row->value)->toString();
-            return $row;
-        }, $rows);
 
         return $this->answerSuccess($rows);
     }

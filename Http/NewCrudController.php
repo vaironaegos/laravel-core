@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Astrotech\Core\Laravel\Http;
+
+use Illuminate\Database\Eloquent\Model;
+use Astrotech\Core\Laravel\Http\Actions\Read;
+use Astrotech\Core\Laravel\Http\Actions\Create;
+use Astrotech\Core\Laravel\Http\Actions\Delete;
+use Astrotech\Core\Laravel\Http\Actions\NewSearch;
+use Astrotech\Core\Laravel\Http\Actions\Update;
+use Astrotech\Core\Laravel\Http\Actions\Options;
+
+abstract class NewCrudController extends ControllerBase
+{
+    use Create;
+    use Read;
+    use Update;
+    use Delete;
+    use NewSearch;
+    use Options;
+
+    protected array $requestFields = [];
+
+    abstract protected function modelClassName(): string;
+
+    protected function beforeFill(array &$data): void
+    {
+    }
+
+    protected function beforeSave(Model $record): void
+    {
+    }
+}

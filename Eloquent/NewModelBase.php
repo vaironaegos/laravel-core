@@ -244,7 +244,7 @@ abstract class NewModelBase extends Model
     public function toSoftArray(): array
     {
         $data = $this->toArray();
-        return ['id' => $data['external_id']];
+        return ['id' => $data['id']];
     }
 
     public function isDeleted(): bool

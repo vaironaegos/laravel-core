@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 
-trait Searcheable
+trait NewSearcheable
 {
     /**
      * Operators to be used in request query string:
@@ -150,7 +149,6 @@ trait Searcheable
                             continue;
                         }
                         $query->whereJsonContains($column, [$key => $value[$key]]);
-                        continue;
                     }
                 }
 
@@ -163,8 +161,7 @@ trait Searcheable
                         [$relation, $column] = explode('.', $column);
                         $relation = underscoreToCamelCase($relation);
                         $query->whereHas($relation, function (Builder $query) use ($param, $column) {
-                            $value = isUuidString($param) ? Uuid::fromString($param)->getBytes() : $param;
-                            $query->where($column, $value);
+                            $query->where($column, $param);
                         });
                         continue;
                     }
@@ -172,8 +169,7 @@ trait Searcheable
                     [$relation1, $relation2, $column] = explode('.', $column);
                     $query->whereHas($relation1, function (Builder $query) use ($param, $column, $relation2) {
                         $query->whereHas($relation2, function (Builder $query) use ($param, $column) {
-                            $value = isUuidString($param) ? Uuid::fromString($param)->getBytes() : $param;
-                            $query->where($column, $value);
+                            $query->where($column, $param);
                         });
                     });
                     continue;
@@ -184,8 +180,7 @@ trait Searcheable
                     continue;
                 }
 
-                $value = isUuidString($param) ? Uuid::fromString($param)->getBytes() : $param;
-                $query->where($column, $value);
+                $query->where($column, $param);
                 continue;
             }
 

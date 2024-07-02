@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
+use Astrotech\Core\Laravel\Eloquent\Searcheable;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\Limitable;
 use Astrotech\Core\Laravel\Eloquent\Sorteable;
 use Astrotech\Core\Laravel\Eloquent\Paginatable;
-use Astrotech\Core\Laravel\Eloquent\Searcheable;
 
 trait Search
 {
@@ -27,7 +27,7 @@ trait Search
         $query = $modelName::query();
         $query->whereNull('deleted_at');
 
-        $this->processSearch($query, $request->get('filter'));
+        $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query);
         $this->buildPagination($query);
 

@@ -10,7 +10,7 @@ use Astrotech\Core\Laravel\Eloquent\ModelBase;
 final class InputData extends DtoBase
 {
     public function __construct(
-        public ModelBase $record,
+        public readonly ModelBase $record,
         public readonly string $field,
         public readonly mixed $file,
         public readonly string $path,

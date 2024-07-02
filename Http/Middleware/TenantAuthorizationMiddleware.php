@@ -48,7 +48,7 @@ final class TenantAuthorizationMiddleware
                 'X-Tenant-Schema' => $tenant->schema,
             ]);
 
-            app()->instance('tenant', $tenant);
+            app()->instance('tenant', $tenant->toSoftArray());
 
             return $next($request);
         } catch (SignatureInvalidException $e) {

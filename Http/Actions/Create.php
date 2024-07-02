@@ -19,7 +19,7 @@ trait Create
         $data = empty($this->requestFields) ? $request->all() : $request->only($this->requestFields);
 
         if (!$data) {
-            return $this->answerFail(['payload' => 'empty']);
+            return $this->answerFail(['error' => 'emptyPayload']);
         }
 
         if (isset($data['active'])) {
@@ -34,12 +34,13 @@ trait Create
                 continue;
             }
 
-            $this->proccessImage(InputData::createFromArray([
-                'record' => $record,
-                'field' => $fieldName,
-                'file' => $request->file($fieldName),
-                'path' => $record->uploadPath
-            ]));
+            $this->proccessImage(new InputData(
+                record: $record,
+                field: $fieldName,
+                file: $request->file($fieldName),
+                path: $record->uploadPath
+            ));
+
             unset($data[$fieldName]);
         }
 

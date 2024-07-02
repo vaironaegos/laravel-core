@@ -29,9 +29,7 @@ abstract class NewModelBase extends Model
     /**
      * @var string[]
      */
-    protected $fillable = [
-        'id'
-    ];
+    protected $fillable = ['id'];
 
     protected array $rules = [];
 
@@ -46,8 +44,7 @@ abstract class NewModelBase extends Model
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
             $this->attributes = $model->getAttributes();
-            $rules = $model->getRules();
-            $validator = Validator::make($this->attributes, $rules);
+            $validator = Validator::make($this->attributes, $this->rules);
 
             if (!$validator->fails()) {
                 return;
@@ -90,11 +87,6 @@ abstract class NewModelBase extends Model
         static::deleting($beforeDeleteCallback);
     }
 
-    public function getIdAttribute()
-    {
-        return $this->attributes['external_id'];
-    }
-
     public function afterSave(NewModelBase $model): void
     {
     }
@@ -113,33 +105,19 @@ abstract class NewModelBase extends Model
             $snakeCaseAttr = Str::snake($attributeName);
             $attributes[$snakeCaseAttr] = $value;
 
-            $rules = $this->getRules();
             if (isset($rules[$snakeCaseAttr])) {
                 $attrRule = $rules[$snakeCaseAttr];
                 if (is_string($value) && is_array($attrRule) && in_array('json', $attrRule)) {
                     $attributes[$snakeCaseAttr] = json_decode($value, true);
                 }
 
-                if (is_array($attrRule) && in_array('boolean', $rules[$snakeCaseAttr])) {
+                if (is_array($attrRule) && in_array('boolean', $this->rules[$snakeCaseAttr])) {
                     $attributes[$snakeCaseAttr] = convertToBool($value);
                 }
             }
         }
 
         return parent::fill($attributes);
-    }
-
-    private function getRules(): array
-    {
-        $rules = [];
-        foreach ($this->rules as $field => $rule) {
-            $unique = "unique:{$this->table},{$field},{id}";
-            $id = $this->getAttribute('id');
-            $search = ['unique', ',{id}'];
-            $replace = [$unique, $id ? ",{$this->getAttribute('id')}" : ''];
-            $rules[$field] = str_replace($search, $replace, $rule);
-        }
-        return $rules;
     }
 
     public function addFillable(array $fillable): void
@@ -233,10 +211,18 @@ abstract class NewModelBase extends Model
         return in_array($name, $this->modelAttributes());
     }
 
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+        $data['id'] = $data['external_id'] ?? null;
+        unset($data['external_id']);
+        return $data;
+    }
+
     public function toSoftArray(): array
     {
         $data = $this->toArray();
-        return ['id' => $data['id']];
+        return ['id' => $data['external_id']];
     }
 
     public function isDeleted(): bool

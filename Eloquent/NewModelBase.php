@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Astrotech\Core\Laravel\Eloquent\Casts\UuidToIdCast;
 use DateTimeImmutable;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +14,9 @@ use Astrotech\Core\Base\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Ramsey\Uuid\Uuid;
+use ReflectionClass;
+use ReflectionMethod;
 
 abstract class NewModelBase extends Model
 {
@@ -29,7 +34,7 @@ abstract class NewModelBase extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['id'];
+    protected $fillable = ['id', 'external_id'];
 
     protected array $rules = [];
 
@@ -47,6 +52,7 @@ abstract class NewModelBase extends Model
             $validator = Validator::make($this->attributes, $this->rules);
 
             if (!$validator->fails()) {
+                $model->beforeSave($this);
                 return;
             }
 
@@ -57,7 +63,7 @@ abstract class NewModelBase extends Model
                 $details[] = ['field' => $field, 'error' => $message, 'value' => $value];
             }
 
-            throw new ValidationException($details, 'Validation error occurred in "' . $model::class . '"');
+            throw new ValidationException($details, 'Validation error in model "' . $model::class . '"');
         };
 
         $afterSaveCallback = function (self $model) {
@@ -87,11 +93,16 @@ abstract class NewModelBase extends Model
         static::deleting($beforeDeleteCallback);
     }
 
-    public function afterSave(NewModelBase $model): void
+    protected function beforeSave(NewModelBase $model): void
+    {
+        $model->external_id = Uuid::uuid4()->toString();
+    }
+
+    protected function afterSave(NewModelBase $model): void
     {
     }
 
-    public function beforeDelete(NewModelBase $model): void
+    protected function beforeDelete(NewModelBase $model): void
     {
     }
 
@@ -186,7 +197,7 @@ abstract class NewModelBase extends Model
         $blameName = 'anonymous';
 
         if ($user) {
-            $blameName = "{$user->getAttribute('name')} [{$user->id}]";
+            $blameName = "{$user->getAttribute('name')} [{$user->external_id}]";
         }
 
         if (!$this->exists && $this->hasModelAttribute(self::CREATED_BY)) {
@@ -216,6 +227,17 @@ abstract class NewModelBase extends Model
         $data = parent::toArray();
         $data['id'] = $data['external_id'] ?? null;
         unset($data['external_id']);
+
+        foreach ($this->getCasts() as $fielName => $castName) {
+            [$className,] = explode(':', $castName, 2);
+
+            if ($className !== UuidToIdCast::class) {
+                continue;
+            }
+
+            unset($data[$fielName]);
+        }
+
         return $data;
     }
 
@@ -237,5 +259,29 @@ abstract class NewModelBase extends Model
             $query->whereNull('deleted_at');
         }
         return $query;
+    }
+
+    public function getRelationsList(): array
+    {
+        $model = new ReflectionClass($this);
+        $methods = $model->getMethods(ReflectionMethod::IS_PUBLIC);
+        $relations = [];
+
+        foreach ($methods as $method) {
+            if ($method->class !== $model->getName() || !$method->hasReturnType()) {
+                continue;
+            }
+
+            $returnType = $method->getReturnType()->getName();
+
+            if (!is_subclass_of($returnType, Relation::class)) {
+                continue;
+            }
+
+            $relationType = lcfirst(basename(str_replace('\\', '/', $returnType)));
+            $relations[$relationType][] = $method->name;
+        }
+
+        return $relations;
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
-use App\Models\Tenant;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
+use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
@@ -31,11 +31,10 @@ final class TenantAuthorizationMiddleware
 
             $token = trim(explode(' ', $token)[1]);
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
-            $tenant = Tenant::where('external_id', $payload->tenant->id)
-                ->where('active', 1)
-                ->first();
+            app()->instance('tenant', (array)$payload->tenant);
+            $user = User::firstWhere('external_id', $payload->sub);
 
-            if (!$tenant) {
+            if (!$user) {
                 throw new ValidationException(
                     details: ['error' => 'accessDenied'],
                     code: HttpStatus::FORBIDDEN->value
@@ -43,14 +42,12 @@ final class TenantAuthorizationMiddleware
             }
 
             $request->merge([
-                'X-Tenant-Id' => $tenant->id,
-                'X-Tenant-Name' => $tenant->name,
-                'X-Tenant-Schema' => $tenant->schema,
+                'X-Tenant-Id' => $payload->tenant->id,
+                'X-Tenant-Name' => $payload->tenant->name,
+                'X-Tenant-Schema' => $payload->tenant->schema,
             ]);
 
-            app()->instance('tenant', $tenant->toSoftArray());
-
-            return $next($request);
+            auth('api')->login($user);
         } catch (SignatureInvalidException $e) {
             throw new ValidationException(
                 details: ['error' => 'invalidSignature'],
@@ -67,5 +64,7 @@ final class TenantAuthorizationMiddleware
                 code: HttpStatus::FORBIDDEN->value
             );
         }
+
+        return $next($request);
     }
 }

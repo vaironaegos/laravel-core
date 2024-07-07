@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Astrotech\Core\Laravel\Http\HttpStatus;
+use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Uuid;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 
 trait Delete
 {
@@ -31,13 +32,13 @@ trait Delete
         }
 
         $now = new DateTimeImmutable();
-        $user = auth('api')->user();
+        $user = Auth::user();
 
         $data['deleted_at'] = $now->format('Y-m-d H:i:s');
         $data['deleted_by'] = "{$user->name} [$user->id]";
 
         $record->fill($data);
         $record->save();
-        return $this->answerSuccess($record->toArray());
+        return $this->answerSuccess($record->toSoftArray());
     }
 }

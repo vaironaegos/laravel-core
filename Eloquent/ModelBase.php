@@ -7,6 +7,7 @@ namespace Astrotech\Core\Laravel\Eloquent;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -60,12 +61,13 @@ abstract class ModelBase extends Model
         parent::__construct($attributes);
 
         $beforeSaveCallback = function (self $model) {
+            $model->construct();
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
 
-            $this->attributes = $model->getRecordAttributes();
-            $rules = $model->getRules();
-            $validator = Validator::make($this->attributes, $rules);
+            $model->attributes = $model->getRecordAttributes();
+            $rules = $model->rules;
+            $validator = Validator::make($model->attributes, $rules);
 
             $this->beforeSave($model);
 
@@ -75,6 +77,7 @@ abstract class ModelBase extends Model
 
             $details = [];
             $errors = $validator->errors()->toArray();
+            $data = $model->getAttributes();
             foreach ($errors as $field => $message) {
                 $value = $data[$field] ?? null;
                 $details[] = ['field' => $field, 'error' => $message, 'value' => $value];
@@ -142,7 +145,7 @@ abstract class ModelBase extends Model
             $snakeCaseAttr = Str::snake($attributeName);
             $attributes[$snakeCaseAttr] = $value;
 
-            $rules = $this->getRules();
+            $rules = $this->rules;
             if (isset($rules[$snakeCaseAttr])) {
                 $attrRule = $rules[$snakeCaseAttr];
                 if (is_string($value) && is_array($attrRule) && in_array('json', $attrRule)) {
@@ -188,19 +191,6 @@ abstract class ModelBase extends Model
                 $this->fillable = array_unique($this->fillable);
             }
         }
-    }
-
-    private function getRules(): array
-    {
-        $rules = [];
-        foreach ($this->rules as $field => $rule) {
-            $unique = "unique:{$this->table},{$field},{id}";
-            $id = $this->getAttribute('id');
-            $search = ['unique', ',{id}'];
-            $replace = [$unique, $id ? ",{$this->getAttribute('id')}" : ''];
-            $rules[$field] = str_replace($search, $replace, $rule);
-        }
-        return $rules;
     }
 
     public function uuidColumn(): string
@@ -270,7 +260,7 @@ abstract class ModelBase extends Model
     private function populateBlameableAttributes(): void
     {
         /** @var ModelBase $user */
-        $user = auth('api')->user();
+        $user = Auth::user();
         $blameName = 'anonymous';
 
         if ($user) {

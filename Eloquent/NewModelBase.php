@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Astrotech\Core\Laravel\Eloquent\Casts\UuidToIdCast;
+use ReflectionClass;
+use Ramsey\Uuid\Uuid;
+use ReflectionMethod;
 use DateTimeImmutable;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Astrotech\Core\Base\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Ramsey\Uuid\Uuid;
-use ReflectionClass;
-use ReflectionMethod;
+use Astrotech\Core\Laravel\Eloquent\Casts\UuidToIdCast;
 
 abstract class NewModelBase extends Model
 {
@@ -48,18 +48,20 @@ abstract class NewModelBase extends Model
         parent::__construct($attributes);
 
         $beforeSaveCallback = function (self $model) {
+            $model->construct();
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
-            $this->attributes = $model->getAttributes();
-            $validator = Validator::make($this->attributes, $this->rules);
+            $model->attributes = $model->getAttributes();
+            $validator = Validator::make($model->attributes, $model->rules);
 
             if (!$validator->fails()) {
-                $model->beforeSave($this);
+                $model->beforeSave($model);
                 return;
             }
 
             $details = [];
             $errors = $validator->errors()->toArray();
+            $data = $model->getAttributes();
             foreach ($errors as $field => $message) {
                 $value = $data[$field] ?? null;
                 $details[] = ['field' => $field, 'error' => $message, 'value' => $value];

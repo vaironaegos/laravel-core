@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Astrotech\Core\Laravel\Eloquent\Casts\EfficientUuidCast;
 
 abstract class ModelBase extends Model
@@ -338,6 +339,44 @@ abstract class ModelBase extends Model
         $this->refreshVirtualColumns();
         $localKey = !is_null($localKey) ? 'raw_' . $localKey : null;
         return parent::hasOne($related, $foreignKey, $localKey);
+    }
+
+    public function belongsToMany(
+        $related,
+        $table = null,
+        $foreignPivotKey = null,
+        $relatedPivotKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null
+    ): BelongsToMany {
+        if (empty($this->attributes)) {
+            return parent::belongsToMany(
+                $related,
+                $table,
+                $foreignPivotKey,
+                $relatedPivotKey,
+                $parentKey,
+                $relatedKey,
+                $relation
+            );
+        }
+
+        $this->refreshVirtualColumns();
+        //$foreignPivotKey = !is_null($foreignPivotKey) ? 'raw_' . $foreignPivotKey : null;
+        //$relatedPivotKey = !is_null($relatedPivotKey) ? 'raw_' . $relatedPivotKey : null;
+        $parentKey = !is_null($parentKey) ? 'raw_' . $parentKey : null;
+        $relatedKey = !is_null($relatedKey) ? 'raw_' . $relatedKey : null;
+
+        return parent::belongsToMany(
+            $related,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey,
+            $relatedKey,
+            $relation
+        );
     }
 
     public function toArray(): array

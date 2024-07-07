@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
 use Closure;
-use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleClient;
@@ -46,7 +45,7 @@ final class AuthGuardianMiddleware
             Auth::setUser(new AuthGuardianUser($userInfo['data']));
 
             return $next($request);
-        } catch (RequestException|Throwable $e) {
+        } catch (RequestException $e) {
             return response()->json(['error' => 'Invalid token'], 401);
         }
     }

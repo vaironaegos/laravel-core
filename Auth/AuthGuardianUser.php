@@ -33,6 +33,11 @@ final class AuthGuardianUser implements Authenticatable
         return $this->userInfo[$name];
     }
 
+    public function getAttribute(string $name): mixed
+    {
+        return $this->{$name};
+    }
+
     public function getAuthIdentifierName(): string
     {
         return 'id';

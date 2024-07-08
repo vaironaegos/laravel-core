@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Astrotech\Core\Laravel\Http\HttpStatus;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Uuid;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 
 trait Update
 {
@@ -53,6 +53,6 @@ trait Update
         $this->beforeSave($record);
         $record->save();
 
-        return $this->answerSuccess($record->toArray());
+        return $this->answerSuccess($record->toSoftArray());
     }
 }

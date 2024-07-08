@@ -26,6 +26,8 @@ final class AuthGuardianUser implements Authenticatable
 
     public function __get(string $name): mixed
     {
+        $name = ($name !== 'external_id' ? $name : 'id');
+
         if (!array_key_exists($name, $this->userInfo)) {
             throw new Exception("Invalid user field '{$name}'");
         }

@@ -237,6 +237,10 @@ abstract class NewModelBase extends Model
         unset($data['external_id']);
 
         foreach ($this->getCasts() as $fielName => $castName) {
+            if ($fielName === 'id') {
+                continue;
+            }
+
             [$className,] = explode(':', $castName, 2);
 
             if ($className !== UuidToIdCast::class) {

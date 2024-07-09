@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent\Casts;
 
-use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 use Exception;
+use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 final class UuidToIdCast implements CastsAttributes
@@ -21,6 +21,10 @@ final class UuidToIdCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
         return $this->getRecord($value)->id;
     }
 

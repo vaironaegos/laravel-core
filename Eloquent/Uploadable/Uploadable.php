@@ -9,7 +9,7 @@ use Astrotech\Core\Base\Exception\ValidationException;
 
 trait Uploadable
 {
-    protected function proccessImage(InputData $data): void
+    protected function processImage(InputData $data): void
     {
         if ($data->multiple) {
             $filesNames = [];
@@ -49,7 +49,7 @@ trait Uploadable
             $extension = $data->file->getClientOriginalExtension();
 
             if (!in_array($extension, $data->allowedExtensions)) {
-                throw new ValidationException(["field" => "{$data->field}", "error" => 'invalidExtension']);
+                throw new ValidationException(["field" => $data->field, "error" => 'invalidExtension']);
             }
 
             $fileName = uniqid(date('HisYmd')) . '.' . $extension;

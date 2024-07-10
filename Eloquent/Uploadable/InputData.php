@@ -6,11 +6,12 @@ namespace Astrotech\Core\Laravel\Eloquent\Uploadable;
 
 use Astrotech\Core\Base\Adapter\DtoBase;
 use Astrotech\Core\Laravel\Eloquent\ModelBase;
+use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 
 final class InputData extends DtoBase
 {
     public function __construct(
-        public readonly ModelBase $record,
+        public readonly ModelBase|NewModelBase $record,
         public readonly string $field,
         public readonly mixed $file,
         public readonly string $path,

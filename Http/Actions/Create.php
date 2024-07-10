@@ -34,7 +34,7 @@ trait Create
                 continue;
             }
 
-            $this->proccessImage(new InputData(
+            $this->processImage(new InputData(
                 record: $record,
                 field: $fieldName,
                 file: $request->file($fieldName),

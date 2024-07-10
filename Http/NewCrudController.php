@@ -32,4 +32,8 @@ abstract class NewCrudController extends ControllerBase
     protected function beforeSave(Model $record): void
     {
     }
+
+    protected function afterSave(Model $record): void
+    {
+    }
 }

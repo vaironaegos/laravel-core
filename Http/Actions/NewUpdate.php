@@ -26,10 +26,6 @@ trait NewUpdate
             return $this->answerFail(['error' => 'emptyPayload']);
         }
 
-        if (isset($data['active'])) {
-            $data['active'] = convertToBool($data['active']);
-        }
-
         $modelName = $this->modelClassName();
         $query = $modelName::where('external_id', $id);
 
@@ -51,6 +47,7 @@ trait NewUpdate
         $record->fill($data);
         $this->beforeSave($record);
         $record->save();
+        $this->afterSave($record);
 
         return $this->answerSuccess($record->toSoftArray());
     }

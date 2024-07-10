@@ -48,6 +48,7 @@ trait Create
         $record->fill($data);
         $this->beforeSave($record);
         $record->save();
+        $this->afterSave($record);
 
         return $this->answerSuccess($record->toSoftArray());
     }

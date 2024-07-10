@@ -86,29 +86,29 @@ abstract class NewModelBase extends Model
 
         $afterSaveCallback = function (self $model) {
             $model->attributes = $model->getAttributes();
-            $this->afterSave($model);
+            $model->afterSave($model);
         };
 
         $beforeDeleteCallback = function (self $model) {
             $blameName = 'anonymous';
             $now = new DateTimeImmutable();
 
-            if ($this->exists && $this->hasModelAttribute(self::DELETED_BY)) {
-                $this->setAttribute(static::DELETED_BY, $blameName);
+            if ($model->exists && $model->hasModelAttribute(self::DELETED_BY)) {
+                $model->setAttribute(static::DELETED_BY, $blameName);
             }
 
-            if ($this->exists && $this->hasModelAttribute('deleted_at')) {
-                $this->{static::DELETED_AT} = $now->format('Y-m-d H:i:s');
+            if ($model->exists && $model->hasModelAttribute('deleted_at')) {
+                $model->{static::DELETED_AT} = $now->format('Y-m-d H:i:s');
             }
 
-            $this->beforeDelete($model);
+            $model->beforeDelete($model);
         };
 
-        static::creating($beforeSaveCallback);
-        static::created($afterSaveCallback);
-        static::updating($beforeSaveCallback);
-        static::updated($afterSaveCallback);
-        static::deleting($beforeDeleteCallback);
+        $this::creating($beforeSaveCallback);
+        $this::created($afterSaveCallback);
+        $this::updating($beforeSaveCallback);
+        $this::updated($afterSaveCallback);
+        $this::deleting($beforeDeleteCallback);
     }
 
     /**
@@ -305,9 +305,11 @@ abstract class NewModelBase extends Model
             'restoring',
             'restored',
         ];
+
         if (!in_array($event, $available, true)) {
             throw new RuntimeException('Event not available', ['event' => $event]);
         }
+
         $this->dispatchesEvents[$event] = $handler;
     }
 

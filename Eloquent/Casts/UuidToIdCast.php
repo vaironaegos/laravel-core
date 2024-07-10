@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent\Casts;
 
-use Exception;
+use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
@@ -28,7 +28,7 @@ final class UuidToIdCast implements CastsAttributes
         return $this->getRecord($value)->id;
     }
 
-    private function getRecord(string|int $value): NewModelBase
+    private function getRecord(string|int $value): ?NewModelBase
     {
         $instance = new $this->modelName();
         $record = $instance
@@ -37,7 +37,12 @@ final class UuidToIdCast implements CastsAttributes
             ->first();
 
         if (!$record) {
-            throw new Exception("Record of the table '{$instance->getTable()}' not found with external_id: {$value}");
+            throw new ValidationException([
+                'field' => 'id',
+                'error' => 'relationRecordNotFound',
+                'table' => $instance->getTable(),
+                'value' => $value
+            ]);
         }
 
         return $record;

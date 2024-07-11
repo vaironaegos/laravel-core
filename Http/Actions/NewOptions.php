@@ -6,7 +6,7 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\ModelBase;
 
 trait NewOptions
@@ -24,12 +24,13 @@ trait NewOptions
         $modelName = $this->modelClassName();
         $model = new $modelName();
 
-        $rows = DB::select(
-            "select {$value} as value, {$label} as label
-            from {$model->getTable()}
-            order by {$label} ASC"
-        );
+        $query = $model->select([$value . ' as value', $label . ' as label'])->orderBy($label, 'ASC');
+        $this->modifyOptionsQuery($query);
 
-        return $this->answerSuccess($rows);
+        return $this->answerSuccess($query->get());
+    }
+
+    protected function modifyOptionsQuery(Builder $query): void
+    {
     }
 }

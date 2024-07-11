@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent\Casts;
 
+use stdClass;
+use Illuminate\Support\Facades\DB;
 use Astrotech\Core\Base\Exception\ValidationException;
-use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 final class UuidToIdCast implements CastsAttributes
 {
-    public function __construct(private readonly string $modelName)
+    public function __construct(private readonly string $relatedTableName)
     {
     }
 
@@ -25,22 +26,21 @@ final class UuidToIdCast implements CastsAttributes
             return $value;
         }
 
-        return $this->getRecord($value)->id;
+        return $this->getRecord($key, $value)->id;
     }
 
-    private function getRecord(string|int $value): ?NewModelBase
+    private function getRecord(string $key, string|int $value): stdClass
     {
-        $instance = new $this->modelName();
-        $record = $instance
+        $record = DB::table($this->relatedTableName)
             ->select(['id'])
             ->where('external_id', $value)
             ->first();
 
         if (!$record) {
             throw new ValidationException([
-                'field' => 'id',
+                'field' => $key,
                 'error' => 'relationRecordNotFound',
-                'table' => $instance->getTable(),
+                'table' => $this->relatedTableName,
                 'value' => $value
             ]);
         }

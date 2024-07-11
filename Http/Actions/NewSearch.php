@@ -26,6 +26,7 @@ trait NewSearch
         /** @var Builder $query */
         $query = $modelName::query();
         $query->whereNull('deleted_at');
+        $this->modifySearchQuery($query);
 
         $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query);
@@ -34,5 +35,9 @@ trait NewSearch
         return $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData
         ]);
+    }
+
+    protected function modifySearchQuery(Builder $query): void
+    {
     }
 }

@@ -357,8 +357,8 @@ abstract class NewModelBase extends Model
         $data['id'] = $data['external_id'] ?? null;
         unset($data['external_id']);
 
-        foreach ($this->getCasts() as $fielName => $castName) {
-            if ($fielName === 'id') {
+        foreach ($this->getCasts() as $fieldName => $castName) {
+            if ($fieldName === 'id') {
                 continue;
             }
 
@@ -368,7 +368,7 @@ abstract class NewModelBase extends Model
                 continue;
             }
 
-            unset($data[$fielName]);
+            unset($data[$fieldName]);
         }
 
         return $data;

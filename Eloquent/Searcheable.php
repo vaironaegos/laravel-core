@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Exception;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
@@ -26,7 +27,9 @@ trait Searcheable
      * - btw (BETWEEN)
      *
      * @param Builder $query
+     * @param array $filters
      * @return void
+     * @throws Exception
      * @see https://www.yiiframework.com/doc/guide/2.0/en/rest-filtering-collections#filtering-request
      */
     public function processSearch(Builder $query, array $filters = []): void

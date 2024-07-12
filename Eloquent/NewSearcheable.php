@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Eloquent;
 
 use DateTimeImmutable;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +26,9 @@ trait NewSearcheable
      * - btw (BETWEEN)
      *
      * @param Builder $query
+     * @param array $filters
      * @return void
+     * @throws Exception
      * @see https://www.yiiframework.com/doc/guide/2.0/en/rest-filtering-collections#filtering-request
      */
     public function processSearch(Builder $query, array $filters = []): void
@@ -161,6 +164,7 @@ trait NewSearcheable
                         [$relation, $column] = explode('.', $column);
                         $relation = underscoreToCamelCase($relation);
                         $query->whereHas($relation, function (Builder $query) use ($param, $column) {
+                            $column = $column !== 'id' ? $column : 'external_id';
                             $query->where($column, $param);
                         });
                         continue;

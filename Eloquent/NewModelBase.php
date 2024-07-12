@@ -43,6 +43,8 @@ abstract class NewModelBase extends Model
 
     protected array $rules = [];
 
+    protected bool $hasExternalId = true;
+
     /**
      * Custom validation messages should be implemented within this method.
      */
@@ -123,7 +125,9 @@ abstract class NewModelBase extends Model
             return;
         }
 
-        $model->external_id = Uuid::uuid4()->toString();
+        if ($this->hasExternalId) {
+            $model->external_id = Uuid::uuid4()->toString();
+        }
     }
 
     /**

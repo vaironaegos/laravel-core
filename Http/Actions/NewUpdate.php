@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Astrotech\Core\Laravel\Http\HttpStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Database\Eloquent\Model;
+use Astrotech\Core\Laravel\Http\HttpStatus;
+use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 
 trait NewUpdate
 {
@@ -29,10 +29,10 @@ trait NewUpdate
         $modelName = $this->modelClassName();
         $query = $modelName::where('external_id', $id);
 
-        /** @var Model $record */
+        /** @var NewModelBase $record */
         $record = $query->first();
 
-        if (!$record) {
+        if (!$record || $record->isDeleted()) {
             return $this->answerFail(
                 data: ['field' => 'id', 'error' => 'recordNotFound'],
                 code: HttpStatus::NOT_FOUND

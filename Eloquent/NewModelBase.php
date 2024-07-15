@@ -355,7 +355,7 @@ abstract class NewModelBase extends Model
     {
         $data = parent::toArray();
         $data['id'] = $data['external_id'] ?? null;
-        unset($data['external_id']);
+        unset($data['external_id'], $data['deleted_at'], $data['deleted_by']);
 
         foreach ($this->getCasts() as $fieldName => $castName) {
             if ($fieldName === 'id') {

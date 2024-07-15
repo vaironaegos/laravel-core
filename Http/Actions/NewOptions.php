@@ -7,7 +7,7 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
-use Astrotech\Core\Laravel\Eloquent\ModelBase;
+use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 
 trait NewOptions
 {
@@ -20,11 +20,18 @@ trait NewOptions
             return $this->answerFail(['label' => 'required']);
         }
 
-        /** @var ModelBase $model */
+        /** @var NewModelBase $model */
         $modelName = $this->modelClassName();
         $model = new $modelName();
 
-        $query = $model->select([$value . ' as value', $label . ' as label'])->orderBy($label, 'ASC');
+        $query = $model->select([$value . ' as value', $label . ' as label'])
+            ->orderBy($label, 'ASC');
+
+        if ($model->hasModelAttribute('deleted_at')) {
+            $query->whereNull('deleted_at')
+                ->whereNull('deleted_at');
+        }
+
         $this->modifyOptionsQuery($query);
 
         return $this->answerSuccess($query->get());

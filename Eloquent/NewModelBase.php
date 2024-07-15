@@ -43,6 +43,8 @@ abstract class NewModelBase extends Model
 
     protected array $rules = [];
 
+    protected bool $hasExternalId = true;
+
     /**
      * Custom validation messages should be implemented within this method.
      */
@@ -123,7 +125,9 @@ abstract class NewModelBase extends Model
             return;
         }
 
-        $model->external_id = Uuid::uuid4()->toString();
+        if ($this->hasExternalId) {
+            $model->external_id = Uuid::uuid4()->toString();
+        }
     }
 
     /**
@@ -353,8 +357,8 @@ abstract class NewModelBase extends Model
         $data['id'] = $data['external_id'] ?? null;
         unset($data['external_id']);
 
-        foreach ($this->getCasts() as $fielName => $castName) {
-            if ($fielName === 'id') {
+        foreach ($this->getCasts() as $fieldName => $castName) {
+            if ($fieldName === 'id') {
                 continue;
             }
 
@@ -364,7 +368,7 @@ abstract class NewModelBase extends Model
                 continue;
             }
 
-            unset($data[$fielName]);
+            unset($data[$fieldName]);
         }
 
         return $data;

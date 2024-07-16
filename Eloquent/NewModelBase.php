@@ -41,6 +41,11 @@ abstract class NewModelBase extends Model
      */
     protected $fillable = [];
 
+    /**
+     * @var string[]
+     */
+    protected $appends = [];
+
     protected array $rules = [];
 
     protected bool $hasExternalId = true;
@@ -282,6 +287,17 @@ abstract class NewModelBase extends Model
     public function addGuarded(array $guarded): void
     {
         $this->guarded = [...$this->guarded, ...$guarded];
+    }
+
+    /**
+     * Add appends columns to the model.
+     *
+     * @param array $appendFields
+     * The new appends columns array to be added.
+     */
+    public function addAppends(array $appendFields): void
+    {
+        $this->appends = [...$this->appends, ...$appendFields];
     }
 
     /**

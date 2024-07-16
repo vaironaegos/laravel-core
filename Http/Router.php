@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 final class Router extends Route
 {
-    public static function crud(string $uri, string $controllerName): void
+    public static function crud(string $uri, string $controllerName, array $except = []): void
     {
         $actions = [
             ['verb' => 'get', 'path' => $uri, 'method' => 'search'],
@@ -26,6 +26,9 @@ final class Router extends Route
             $path = $action['path'];
             $method = $action['method'];
             if (!method_exists($controllerName, $method)) {
+                continue;
+            }
+            if (in_array($verb, $except)) {
                 continue;
             }
             //static::$verb($path, "{$controllerName}@{$method}")->middleware("permission:{$method},{$uri}");

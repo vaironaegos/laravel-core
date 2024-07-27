@@ -15,6 +15,7 @@ trait NewRead
     {
         $modelName = $this->modelClassName();
         $query = $modelName::where('external_id', $id);
+        $query->whereNull(['deleted_at', 'deleted_by']);
 
         /** @var NewModelBase $record */
         $record = $query->first();

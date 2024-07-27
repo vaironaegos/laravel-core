@@ -116,6 +116,7 @@ abstract class NewModelBase extends Model
         $this::updating($beforeSaveCallback);
         $this::updated($afterSaveCallback);
         $this::deleting($beforeDeleteCallback);
+        $this::saved($afterSaveCallback);
     }
 
     /**

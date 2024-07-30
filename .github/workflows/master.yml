@@ -1,6 +1,10 @@
 name: "LARAVEL CORE CI/CD"
 
 on:
+  pull_request:
+    branches:
+      - beta
+
   push:
     branches:
       - beta

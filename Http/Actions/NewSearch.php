@@ -29,7 +29,7 @@ trait NewSearch
         $this->modifySearchQuery($query);
 
         $this->processSearch($query, $request->get('filter', []));
-        $this->processSort($query);
+        $this->processSort($query, $request->input('sort', ''));
         $this->buildPagination($query);
 
         return $this->answerSuccess($this->data, [

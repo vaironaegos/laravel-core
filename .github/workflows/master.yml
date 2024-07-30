@@ -1,0 +1,40 @@
+name: "LARAVEL CORE CI/CD"
+
+on:
+  push:
+    branches:
+      - beta
+
+jobs:
+  qa:
+    name: Backend Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Reconfigure git to use HTTP authentication
+        run: git config --global url."https://${{ secrets.GH_ACTIONS_PAT }}@github.com/".insteadOf ssh://git@github.com/
+
+      - name: 🚚 Get latest code from ${{ github.head_ref }} branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GH_ACTIONS_PAT }}
+          submodules: recursive
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: ⚡ Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: 📦 Install composer dependencies
+        uses: "ramsey/composer-install@v2"
+        with:
+          composer-options: "--ignore-platform-reqs --optimize-autoloader"
+
+      - name: 🐞 PHP Code Sniffer
+        run: composer phpcs

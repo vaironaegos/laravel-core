@@ -30,7 +30,7 @@ trait NewSearch
 
         $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query, $request->input('sort', ''));
-        $this->buildPagination($query);
+        $this->buildPagination($query, (int) $request->input('perPage', 40));
 
         return $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData

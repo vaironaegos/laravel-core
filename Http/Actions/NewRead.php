@@ -6,6 +6,7 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 
@@ -16,6 +17,7 @@ trait NewRead
         $modelName = $this->modelClassName();
         $query = $modelName::where('external_id', $id);
         $query->whereNull(['deleted_at', 'deleted_by']);
+        $this->modifyReadQuery($query);
 
         /** @var NewModelBase $record */
         $record = $query->first();
@@ -28,5 +30,9 @@ trait NewRead
         }
 
         return $this->answerSuccess($record->toArray());
+    }
+
+    protected function modifyReadQuery(Builder $query): void
+    {
     }
 }

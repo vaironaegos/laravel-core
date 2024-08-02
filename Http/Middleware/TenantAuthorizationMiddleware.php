@@ -11,6 +11,7 @@ use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
@@ -32,6 +33,20 @@ final class TenantAuthorizationMiddleware
             $token = trim(explode(' ', $token)[1]);
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
             app()->instance('tenant', (array)$payload->tenant);
+
+            $request->merge([
+                'X-Tenant-Id' => $payload->tenant->id,
+                'X-Tenant-Name' => $payload->tenant->name,
+                'X-Tenant-Schema' => $payload->tenant->schema,
+            ]);
+
+            $userCacheKey = "{$payload->tenant->schema}_{$payload->sub}";
+
+            if (Cache::has($userCacheKey)) {
+                auth('api')->login(Cache::get($userCacheKey));
+                return $next($request);
+            }
+
             $user = User::firstWhere('external_id', $payload->sub);
 
             if (!$user) {
@@ -41,12 +56,7 @@ final class TenantAuthorizationMiddleware
                 );
             }
 
-            $request->merge([
-                'X-Tenant-Id' => $payload->tenant->id,
-                'X-Tenant-Name' => $payload->tenant->name,
-                'X-Tenant-Schema' => $payload->tenant->schema,
-            ]);
-
+            Cache::put($userCacheKey, $user);
             auth('api')->login($user);
         } catch (SignatureInvalidException $e) {
             throw new ValidationException(

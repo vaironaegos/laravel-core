@@ -34,11 +34,13 @@ final class TenantAuthorizationMiddleware
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
             app()->instance('tenant', (array)$payload->tenant);
 
-            $request->merge([
-                'X-Tenant-Id' => $payload->tenant->id,
-                'X-Tenant-Name' => $payload->tenant->name,
-                'X-Tenant-Schema' => $payload->tenant->schema,
-            ]);
+            $request->headers->set('X-User-Id', $payload->sub);
+            $request->headers->set('X-User-Name', $payload->name);
+            $request->headers->set('X-User-Login', $payload->login);
+            $request->headers->set('X-Tenant-Id', $payload->tenant->id);
+            $request->headers->set('X-Tenant-Name', $payload->tenant->name);
+            $request->headers->set('X-Tenant-Schema', $payload->tenant->schema);
+            $request->headers->set('X-Tenant-Url', $payload->tenant->url);
 
             $model = new User();
             $userCacheKey = "{$model->getTable()}_{$payload->sub}";
@@ -60,6 +62,7 @@ final class TenantAuthorizationMiddleware
             }
 
             auth('api')->login($user);
+            return $next($request);
         } catch (SignatureInvalidException $e) {
             throw new ValidationException(
                 details: ['error' => 'invalidSignature'],
@@ -76,7 +79,5 @@ final class TenantAuthorizationMiddleware
                 code: HttpStatus::FORBIDDEN->value
             );
         }
-
-        return $next($request);
     }
 }

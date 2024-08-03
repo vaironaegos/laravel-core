@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
+use Illuminate\Support\Facades\Cache;
 
 trait NewOptions
 {
@@ -23,6 +24,11 @@ trait NewOptions
         /** @var NewModelBase $model */
         $modelName = $this->modelClassName();
         $model = new $modelName();
+        $cacheKey = $model->getTable() . '_options';
+
+        if (Cache::has($cacheKey)) {
+            return $this->answerSuccess(Cache::get($cacheKey));
+        }
 
         $query = $model->select([$value . ' as value', $label . ' as label'])
             ->orderBy($label, 'ASC');
@@ -34,7 +40,10 @@ trait NewOptions
 
         $this->modifyOptionsQuery($query);
 
-        return $this->answerSuccess($query->get());
+        $response = $this->answerSuccess($query->get());
+        Cache::put($cacheKey, $query->get(), 120);
+
+        return $response;
     }
 
     protected function modifyOptionsQuery(Builder $query): void

@@ -11,6 +11,7 @@ use Astrotech\Core\Laravel\Eloquent\Limitable;
 use Astrotech\Core\Laravel\Eloquent\Sorteable;
 use Astrotech\Core\Laravel\Eloquent\Paginatable;
 use Astrotech\Core\Laravel\Eloquent\NewSearcheable;
+use Illuminate\Support\Facades\Cache;
 
 trait NewSearch
 {
@@ -22,6 +23,12 @@ trait NewSearch
     public function search(Request $request): JsonResponse
     {
         $modelName = $this->modelClassName();
+        $model = new $modelName();
+        $cacheKey = $model->getTable() . '_search_' . $request->getQueryString();
+
+        if (Cache::has($cacheKey)) {
+            return $this->answerSuccess(Cache::get($cacheKey));
+        }
 
         /** @var Builder $query */
         $query = $modelName::query();
@@ -30,11 +37,15 @@ trait NewSearch
 
         $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query, $request->input('sort', ''));
-        $this->buildPagination($query, (int) $request->input('perPage', 40));
+        $this->buildPagination($query, (int)$request->input('perPage', 40));
 
-        return $this->answerSuccess($this->data, [
+        $response = $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData
         ]);
+
+        Cache::put($cacheKey, json_decode($response->getContent(), true), 120);
+
+        return $response;
     }
 
     protected function modifySearchQuery(Builder $query): void

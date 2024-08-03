@@ -35,7 +35,10 @@ trait NewDelete
         $data['deleted_by'] = "{$user->name} [$user->external_id]";
 
         $record->fill($data);
+        $this->beforeSave($record);
         $record->save();
+        $this->afterSave($record);
+        $this->afterSoftDelete($record);
 
         return $this->answerSuccess($record->toSoftArray());
     }

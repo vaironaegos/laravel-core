@@ -40,13 +40,16 @@ final class TenantAuthorizationMiddleware
                 'X-Tenant-Schema' => $payload->tenant->schema,
             ]);
 
-            $userCacheKey = "{$payload->tenant->schema}_{$payload->sub}";
+            $model = new User();
+            $userCacheKey = "{$model->getTable()}_{$payload->sub}";
 
             if (Cache::has($userCacheKey)) {
-                auth('api')->login(Cache::get($userCacheKey));
+                $userAttributes = Cache::get($userCacheKey);
+                auth('api')->login(new User($userAttributes));
                 return $next($request);
             }
 
+            /** @var User $user */
             $user = User::firstWhere('external_id', $payload->sub);
 
             if (!$user) {
@@ -56,7 +59,6 @@ final class TenantAuthorizationMiddleware
                 );
             }
 
-            Cache::put($userCacheKey, $user);
             auth('api')->login($user);
         } catch (SignatureInvalidException $e) {
             throw new ValidationException(

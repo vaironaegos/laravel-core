@@ -540,4 +540,9 @@ abstract class NewModelBase extends Model
             $this->rules[static::DELETED_BY] = ['nullable', 'string'];
         }
     }
+
+    public static function tableName(): string
+    {
+        return Str::snake(Str::pluralStudly(class_basename(static::class)));
+    }
 }

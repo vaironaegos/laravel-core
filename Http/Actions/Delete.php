@@ -38,7 +38,10 @@ trait Delete
         $data['deleted_by'] = "{$user->name} [$user->id]";
 
         $record->fill($data);
+        $this->beforeSave($record);
         $record->save();
+        $this->afterSave($record);
+
         return $this->answerSuccess($record->toSoftArray());
     }
 }

@@ -12,6 +12,7 @@ use Astrotech\Core\Laravel\Eloquent\Sorteable;
 use Astrotech\Core\Laravel\Eloquent\Paginatable;
 use Astrotech\Core\Laravel\Eloquent\NewSearcheable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Response;
 
 trait NewSearch
 {
@@ -27,7 +28,7 @@ trait NewSearch
         $cacheKey = $model->getTable() . '_search_' . $request->getQueryString();
 
         if (Cache::has($cacheKey)) {
-            return $this->answerSuccess(Cache::get($cacheKey));
+            return Response::json(Cache::get($cacheKey));
         }
 
         /** @var Builder $query */

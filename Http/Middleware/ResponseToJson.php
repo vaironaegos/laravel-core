@@ -16,7 +16,10 @@ final class ResponseToJson
 
         /** @var Response $response */
         $response = $next($request);
-        $response->header('Content-Type', 'application/json');
+
+        if (str_contains($response->headers->get('content-type'), 'text/html')) {
+            $response->header('Content-Type', 'application/json');
+        }
 
         return $response;
     }

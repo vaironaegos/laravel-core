@@ -136,7 +136,7 @@ abstract class NewModelBase extends Model
             return;
         }
 
-        if ($this->hasExternalId) {
+        if ($this->hasExternalId && !$model->external_id) {
             $model->external_id = Uuid::uuid4()->toString();
         }
     }

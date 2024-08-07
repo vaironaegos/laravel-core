@@ -175,8 +175,8 @@ abstract class NewModelBase extends Model
             $snakeCaseAttr = Str::snake($attributeName);
             $attributes[$snakeCaseAttr] = $value;
 
-            if (isset($rules[$snakeCaseAttr])) {
-                $attrRule = $rules[$snakeCaseAttr];
+            if (isset($this->rules[$snakeCaseAttr])) {
+                $attrRule = $this->rules[$snakeCaseAttr];
                 if (is_string($value) && is_array($attrRule) && in_array('json', $attrRule)) {
                     $attributes[$snakeCaseAttr] = json_decode($value, true);
                 }

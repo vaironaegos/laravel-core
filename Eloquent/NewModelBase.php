@@ -67,6 +67,11 @@ abstract class NewModelBase extends Model
         $this->populateRulesFields();
         $this->construct();
         parent::__construct($attributes);
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
 
         $beforeSaveCallback = function (self $model) {
             $model->construct();
@@ -111,12 +116,12 @@ abstract class NewModelBase extends Model
             $model->beforeDelete($model);
         };
 
-        $this::creating($beforeSaveCallback);
-        $this::created($afterSaveCallback);
-        $this::updating($beforeSaveCallback);
-        $this::updated($afterSaveCallback);
-        $this::deleting($beforeDeleteCallback);
-        $this::saved($afterSaveCallback);
+        self::creating($beforeSaveCallback);
+        self::created($afterSaveCallback);
+        self::updating($beforeSaveCallback);
+        self::updated($afterSaveCallback);
+        self::deleting($beforeDeleteCallback);
+        self::saved($afterSaveCallback);
     }
 
     /**

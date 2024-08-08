@@ -563,8 +563,8 @@ abstract class NewModelBase extends Model
         return self::where('external_id', $externalId)->first();
     }
 
-    public static function getIdFromExternalId($externalId): ?int
+    public static function getIdFromExternalId(string $externalId): ?int
     {
-        return self::where('external_id', $externalId)->select('id')->first()->id ?? null;
+        return self::where('external_id', $externalId)->select('id')->first()?->id;
     }
 }

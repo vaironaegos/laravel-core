@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
-use Astrotech\Core\Laravel\Eloquent\NewModelBase;
-use Astrotech\Core\Laravel\Http\HttpStatus;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Builder;
+use Astrotech\Core\Laravel\Http\HttpStatus;
+use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 
 trait NewDelete
 {
@@ -18,6 +19,7 @@ trait NewDelete
         $query = $modelName::where('external_id', $id)
             ->whereNull('deleted_at')
             ->whereNull('deleted_by');
+        $this->modifyDeleteQuery($query);
 
         /** @var NewModelBase $record */
         $record = $query->first();
@@ -41,5 +43,9 @@ trait NewDelete
         $this->afterSoftDelete($record);
 
         return $this->answerSuccess($record->toSoftArray());
+    }
+
+    protected function modifyDeleteQuery(Builder $query): void
+    {
     }
 }

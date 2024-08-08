@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Astrotech\Core\Base\Exception\RuntimeException;
@@ -556,5 +556,15 @@ abstract class NewModelBase extends Model
     public static function tableName(): string
     {
         return Str::snake(Str::pluralStudly(class_basename(static::class)));
+    }
+
+    public static function findByExternalId(string $externalId): ?self
+    {
+        return self::where('external_id', $externalId)->first();
+    }
+
+    public static function getIdFromExternalId($externalId): ?int
+    {
+        return self::where('external_id', $externalId)->select('id')->first()->id ?? null;
     }
 }

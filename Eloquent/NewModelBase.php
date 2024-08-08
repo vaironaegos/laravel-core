@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
@@ -149,6 +150,10 @@ abstract class NewModelBase extends Model
      */
     protected function afterSave(NewModelBase $model): void
     {
+        Cache::put("{$model->getTable()}_{$model->external_id}", $model->getAttributes());
+        Cache::delete("{$model->getTable()}_collection");
+        Cache::delete("{$model->getTable()}_options");
+        Cache::delete("{$model->getTable()}_search*");
     }
 
     /**
@@ -159,6 +164,8 @@ abstract class NewModelBase extends Model
      */
     protected function beforeDelete(NewModelBase $model): void
     {
+        Cache::delete("{$model->getTable()}_{$model->external_id}");
+        Cache::delete("{$model->getTable()}_search*");
     }
 
     /**

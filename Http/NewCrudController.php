@@ -36,15 +36,9 @@ abstract class NewCrudController extends ControllerBase
 
     protected function afterSave(NewModelBase $record): void
     {
-        Cache::put("{$record->getTable()}_{$record->external_id}", $record->getAttributes());
-        Cache::delete("{$record->getTable()}_collection");
-        Cache::delete("{$record->getTable()}_options");
-        Cache::delete("{$record->getTable()}_search_*");
     }
 
     protected function afterSoftDelete(NewModelBase $record): void
     {
-        Cache::delete("{$record->getTable()}_{$record->external_id}");
-        Cache::delete("{$record->getTable()}_search_*");
     }
 }

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
+use Illuminate\Support\Facades\Cache;
+use Astrotech\Core\Laravel\Http\Actions\Create;
+use Astrotech\Core\Laravel\Http\Actions\NewRead;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
 use Astrotech\Core\Laravel\Http\Actions\NewDelete;
-use Astrotech\Core\Laravel\Http\Actions\NewOptions;
-use Astrotech\Core\Laravel\Http\Actions\NewRead;
-use Astrotech\Core\Laravel\Http\Actions\NewUpdate;
-use Astrotech\Core\Laravel\Http\Actions\Create;
 use Astrotech\Core\Laravel\Http\Actions\NewSearch;
-use Illuminate\Support\Facades\Cache;
+use Astrotech\Core\Laravel\Http\Actions\NewUpdate;
+use Astrotech\Core\Laravel\Http\Actions\NewOptions;
 
 abstract class NewCrudController extends ControllerBase
 {
@@ -39,10 +39,12 @@ abstract class NewCrudController extends ControllerBase
         Cache::put("{$record->getTable()}_{$record->external_id}", $record->getAttributes());
         Cache::delete("{$record->getTable()}_collection");
         Cache::delete("{$record->getTable()}_options");
+        Cache::delete("{$record->getTable()}_search_*");
     }
 
     protected function afterSoftDelete(NewModelBase $record): void
     {
         Cache::delete("{$record->getTable()}_{$record->external_id}");
+        Cache::delete("{$record->getTable()}_search_*");
     }
 }

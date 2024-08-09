@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Illuminate\Database\Eloquent\Builder;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
@@ -23,6 +24,11 @@ use Astrotech\Core\Laravel\Eloquent\Casts\UuidToIdCast;
  * It includes methods for handling fillable fields, validation, events, and casting.
  *
  * @package App\Models
+ *
+ * @property int $id
+ * @property int $external_id
+ *
+ * @method static Builder activatedAndNotDeleted()
  */
 abstract class NewModelBase extends Model
 {
@@ -566,5 +572,12 @@ abstract class NewModelBase extends Model
     public static function getIdFromExternalId(string $externalId): ?int
     {
         return self::where('external_id', $externalId)->select('id')->first()?->id;
+    }
+
+    public function scopeActivatedAndNotDeleted(Builder $query): Builder
+    {
+        return $query->where('active', 1)
+            ->whereNull('deleted_at')
+            ->whereNull('deleted_by');
     }
 }

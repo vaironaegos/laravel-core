@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Illuminate\Database\Eloquent\Builder;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 use Astrotech\Core\Base\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
@@ -566,12 +566,17 @@ abstract class NewModelBase extends Model
 
     public static function findByExternalId(string $externalId): ?self
     {
-        return self::where('external_id', $externalId)->first();
+        return self::where('external_id', $externalId)
+            ->whereNull(['deleted_at', 'deleted_by'])
+            ->first();
     }
 
     public static function getIdFromExternalId(string $externalId): ?int
     {
-        return self::where('external_id', $externalId)->select('id')->first()?->id;
+        return self::where('external_id', $externalId)
+            ->whereNull(['deleted_at', 'deleted_by'])
+            ->select('id')
+            ->first()?->id;
     }
 
     public function scopeActivatedAndNotDeleted(Builder $query): Builder

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
+use Astrotech\Core\Base\Exception\ValidationException;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
 use App\Models\User;
 use Firebase\JWT\JWT;
@@ -21,6 +23,7 @@ final class AuthorizationMiddleware
      * @param \Illuminate\Http\Request $request
      * @param Closure $next
      * @return mixed
+     * @throws ValidationException
      */
     public function handle(Request $request, Closure $next)
     {
@@ -28,7 +31,10 @@ final class AuthorizationMiddleware
             $token = $request->headers->get('Authorization');
 
             if (!$token) {
-                return response()->json(['status' => 'Your request was made without an authorization token.'], 403);
+                throw new ValidationException(
+                    details: ['error' => 'missingAuthorizationHeader'],
+                    code: HttpStatus::UNAUTHORIZED->value
+                );
             }
 
             $token = trim(explode(' ', $token)[1]);

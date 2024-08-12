@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
+use App\Models\Tenant;
 use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
-use App\Models\User;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
@@ -31,51 +28,28 @@ final class TenantAuthorizationMiddleware
             }
 
             $token = trim(explode(' ', $token)[1]);
-            $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
-            app()->instance('tenant', (array)$payload->tenant);
+            $tenant = Tenant::authenticateTenant($token);
+            app()->instance('tenant', $tenant->toSoftArray());
 
-            $request->headers->set('X-User-Id', $payload->sub);
-            $request->headers->set('X-User-Name', $payload->name);
-            $request->headers->set('X-User-Login', $payload->login);
-            $request->headers->set('X-Tenant-Id', $payload->tenant->id);
-            $request->headers->set('X-Tenant-Name', $payload->tenant->name);
-            $request->headers->set('X-Tenant-Schema', $payload->tenant->schema);
-            $request->headers->set('X-Tenant-Url', $payload->tenant->url);
+            $request->headers->set('X-Tenant-Id', $tenant->external_id);
+            $request->headers->set('X-Tenant-Name', $tenant->name);
+            $request->headers->set('X-Tenant-Schema', $tenant->schema);
+            $request->headers->set('X-Tenant-Url', $tenant->url);
 
-            $model = new User();
-            $userCacheKey = "{$model->getTable()}_{$payload->sub}";
-
-            if (Cache::has($userCacheKey)) {
-                $userAttributes = Cache::get($userCacheKey);
-                auth('api')->login(new User($userAttributes));
-                return $next($request);
-            }
-
-            /** @var User $user */
-            $user = User::firstWhere('external_id', $payload->sub);
-
-            if (!$user) {
-                throw new ValidationException(
-                    details: ['error' => 'accessDenied'],
-                    code: HttpStatus::FORBIDDEN->value
-                );
-            }
-
-            auth('api')->login($user);
             return $next($request);
         } catch (SignatureInvalidException $e) {
             throw new ValidationException(
-                details: ['error' => 'invalidSignature'],
+                details: ['error' => 'invalidSignature', 'message' => $e->getMessage()],
                 code: HttpStatus::FORBIDDEN->value
             );
         } catch (TokenExpiredException $e) {
             throw new ValidationException(
-                details: ['error' => 'expiredToken'],
+                details: ['error' => 'expiredToken', 'message' => $e->getMessage()],
                 code: HttpStatus::FORBIDDEN->value
             );
         } catch (UnexpectedValueException $e) {
             throw new ValidationException(
-                details: ['error' => 'invalidToken'],
+                details: ['error' => 'unexpectedTokenValue', 'message' => $e->getMessage()],
                 code: HttpStatus::FORBIDDEN->value
             );
         }

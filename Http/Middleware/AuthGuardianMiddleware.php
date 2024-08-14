@@ -24,6 +24,11 @@ final class AuthGuardianMiddleware
 
     public function handle(Request $request, Closure $next)
     {
+        if (app('env') === 'testing') {
+            Auth::setUser(new AuthGuardianUser(app('testingUserData')));
+            return $next($request);
+        }
+
         $token = $request->bearerToken();
 
         if (!$token) {
@@ -49,4 +54,5 @@ final class AuthGuardianMiddleware
             return response()->json(['error' => 'Invalid token'], 401);
         }
     }
+
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
-use Illuminate\Support\Facades\Cache;
+use Astrotech\Core\Laravel\Utils\Cache;
 
 trait NewOptions
 {

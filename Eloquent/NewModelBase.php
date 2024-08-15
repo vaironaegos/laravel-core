@@ -8,7 +8,7 @@ use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Astrotech\Core\Laravel\Utils\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
@@ -159,7 +159,7 @@ abstract class NewModelBase extends Model
         Cache::put("{$model->getTable()}_{$model->external_id}", $model->getAttributes());
         Cache::delete("{$model->getTable()}_collection");
         Cache::delete("{$model->getTable()}_options");
-        Cache::delete("{$model->getTable()}_search*");
+        Cache::delPattern("{$model->getTable()}_search*");
     }
 
     /**

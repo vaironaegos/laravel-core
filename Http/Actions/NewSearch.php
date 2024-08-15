@@ -11,7 +11,7 @@ use Astrotech\Core\Laravel\Eloquent\Limitable;
 use Astrotech\Core\Laravel\Eloquent\Sorteable;
 use Astrotech\Core\Laravel\Eloquent\Paginatable;
 use Astrotech\Core\Laravel\Eloquent\NewSearcheable;
-use Illuminate\Support\Facades\Cache;
+use Astrotech\Core\Laravel\Utils\Cache;
 use Illuminate\Support\Facades\Response;
 
 trait NewSearch

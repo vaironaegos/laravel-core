@@ -19,6 +19,7 @@ trait NewDelete
         $query = $modelName::where('external_id', $id)
             ->whereNull('deleted_at')
             ->whereNull('deleted_by');
+
         $this->modifyDeleteQuery($query);
 
         /** @var NewModelBase $record */

@@ -54,5 +54,4 @@ final class AuthGuardianMiddleware
             return response()->json(['error' => 'Invalid token'], 401);
         }
     }
-
 }

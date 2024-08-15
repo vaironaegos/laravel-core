@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
-use Illuminate\Support\Facades\Cache;
 use Astrotech\Core\Laravel\Http\Actions\Create;
 use Astrotech\Core\Laravel\Http\Actions\NewRead;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;

@@ -14,7 +14,7 @@ final class Cache extends LaravelCache
         /** @var RedisManager $redis */
         $redis = app()->make('redis');
         $redis->select(config('database.redis.cache.database'));
-        $preCofix = config('database.redis.options.prefix');
+        $prefix = config('database.redis.options.prefix');
         $keys = $redis->keys($pattern);
 
         if (empty($keys)) {

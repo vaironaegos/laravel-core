@@ -27,7 +27,23 @@ final class TenantAuthorizationMiddleware
                 );
             }
 
-            $token = trim(explode(' ', $token)[1]);
+            if (!str_contains($token, 'Basic')) {
+                throw new ValidationException(
+                    details: ['error' => 'invalidToken'],
+                    code: HttpStatus::UNAUTHORIZED->value
+                );
+            }
+
+            $explodeToken = explode(' ', $token);
+
+            if (count($explodeToken) !== 2) {
+                throw new ValidationException(
+                    details: ['error' => 'invalidToken'],
+                    code: HttpStatus::UNAUTHORIZED->value
+                );
+            }
+
+            $token = trim($explodeToken[1]);
             $tenant = Tenant::authenticateTenant($token);
             app()->instance('tenant', $tenant->toSoftArray());
 

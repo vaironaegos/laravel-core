@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Console\Commands;
 
+use Astrotech\Core\Laravel\Mail\MailTestMessage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use MailTestMessage;
 use Symfony\Component\Mailer\SentMessage;
+use Throwable;
 
 final class MailTest extends Command
 {

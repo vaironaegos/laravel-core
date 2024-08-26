@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Adapters;
 
-use App\Models\Log;
 use DateTimeImmutable;
 use Astrotech\Core\Base\Infra\Enum\LogLevelEnum;
 use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
@@ -61,6 +60,6 @@ final class LaravelMongoDbLog implements LogSystem
             'extraData' => $extraData
         ];
 
-        (new Log($data))->save();
+        // persist $data variable
     }
 }

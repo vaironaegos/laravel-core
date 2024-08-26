@@ -566,7 +566,7 @@ abstract class NewModelBase extends Model
 
     public static function findByExternalId(string $externalId): ?self
     {
-        return self::where('external_id', $externalId)
+        return static::where('external_id', $externalId)
             ->whereNull(['deleted_at', 'deleted_by'])
             ->first();
     }

@@ -69,7 +69,8 @@ final class AuthGuardianUser implements Authenticatable
         return null;
     }
 
-    public function getAuthPasswordName()
+    public function getAuthPasswordName(): ?string
     {
+        return null;
     }
 }

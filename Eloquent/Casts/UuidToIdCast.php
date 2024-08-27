@@ -22,6 +22,10 @@ final class UuidToIdCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
+        if (is_null($value)) {
+            return $value;
+        }
+
         if (is_numeric($value)) {
             return $value;
         }

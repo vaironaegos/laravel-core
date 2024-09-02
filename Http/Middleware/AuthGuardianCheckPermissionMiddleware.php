@@ -38,7 +38,7 @@ final class AuthGuardianCheckPermissionMiddleware
             }
             return $next($request);
         } catch (Exception $e) {
-            return response()->json(['error' => 'permissionDenied', 'message' => $e->getTrace()], 403);
+            return response()->json(['error' => 'permissionDenied'], 403);
         }
     }
 }

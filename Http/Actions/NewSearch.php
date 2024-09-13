@@ -21,7 +21,7 @@ trait NewSearch
     use Limitable;
     use Paginatable;
 
-    public function search(Request $request): JsonResponse
+    public function search(Request $request, string $method = 'toSoftArray'): JsonResponse
     {
         $modelName = $this->modelClassName();
         $model = new $modelName();
@@ -38,7 +38,7 @@ trait NewSearch
 
         $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query, $request->input('sort', ''));
-        $this->buildPagination($query, (int)$request->input('perPage', 40));
+        $this->buildPagination($query, (int)$request->input('perPage', 40), $method);
 
         $response = $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData

@@ -21,11 +21,11 @@ trait NewSearch
     use Limitable;
     use Paginatable;
 
-    public function search(Request $request, string $method = 'toSoftArray'): JsonResponse
+    public function search(Request $request, string $method = 'toSoftArray', string $cacheAppend = ''): JsonResponse
     {
         $modelName = $this->modelClassName();
         $model = new $modelName();
-        $cacheKey = $model->getTable() . '_search_' . $request->getQueryString();
+        $cacheKey = $model->getTable() . '_search_' . $request->getQueryString() . $cacheAppend;
 
         if (Cache::has($cacheKey)) {
             return Response::json(Cache::get($cacheKey));

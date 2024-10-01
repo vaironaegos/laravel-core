@@ -34,8 +34,10 @@ trait NewDelete
 
         $now = new DateTimeImmutable();
         $user = auth('api')->user();
+        $username = $user?->name ?? 'anonymous';
+        $id = $user?->external_id ? " [$user->external_id]" : '';
         $data['deleted_at'] = $now->format('Y-m-d H:i:s');
-        $data['deleted_by'] = "{$user->name} [$user->external_id]";
+        $data['deleted_by'] = "{$username}{$id}";
 
         $record->fill($data);
         $this->beforeSave($record);

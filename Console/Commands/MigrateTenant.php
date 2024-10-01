@@ -28,13 +28,16 @@ final class MigrateTenant extends Command
         );
 
         if (empty($schemaExists)) {
+            $this->info("Schema '{$schema}' does not exists! Creating...");
             DB::connection($connection)->statement('CREATE SCHEMA ' . $schema);
-            $this->info('Schema created: ' . $schema);
+            $this->info('New schema created!');
         }
 
         DB::connection($connection)->statement('SET search_path TO ' . $schema);
 
+        $this->info("Changing migrations table to '{$schema}.migrations' tables...");
         Config::set('database.migrations', $schema . '.migrations');
+        $this->info("Done!");
 
         $options = [
             '--database' => $connection,
@@ -43,15 +46,19 @@ final class MigrateTenant extends Command
         ];
 
         if ($this->option('fresh')) {
-            $this->info('Cleaning all ' . $schema . ' tables...');
+            $this->info("Dropping schema '{$schema}'...");
             DB::connection($connection)->statement("DROP SCHEMA IF EXISTS {$schema} CASCADE");
+            $this->info("Schema deleted!");
+            $this->info("Create schema '{$schema}'...");
             DB::connection($connection)->statement("CREATE SCHEMA {$schema}");
-            $this->info('Done!');
+            $this->info("Schema created!");
         }
 
         $this->info('Running migrations for schema: ' . $schema);
         $output = new BufferedOutput();
+        DB::connection($connection)->statement('SET search_path TO ' . $schema);
         Artisan::call('migrate', $options, $output);
+        DB::connection($connection)->statement('SET search_path TO ' . $schema);
         $this->info($output->fetch());
         $this->info('Migrations completed for schema: ' . $schema);
     }

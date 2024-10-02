@@ -49,6 +49,10 @@ final class AuthGuardianMiddleware
             $userInfo = json_decode((string)$response->getBody(), true);
             Auth::setUser(new AuthGuardianUser($userInfo['data']));
 
+            $request->headers->set('X-User-Id', $userInfo['data']['id']);
+            $request->headers->set('X-User-Name', $userInfo['data']['name']);
+            $request->headers->set('X-User-Login', $userInfo['data']['login']);
+
             return $next($request);
         } catch (RequestException $e) {
             return response()->json(['error' => 'Invalid token'], 401);

@@ -33,7 +33,11 @@ trait NewSearch
 
         /** @var Builder $query */
         $query = $modelName::query();
-        $query->whereNull(['deleted_at', 'deleted_by']);
+
+        if ($model->hasModelAttribute('deleted_at')) {
+            $query->whereNull(['deleted_at', 'deleted_by']);
+        }
+
         $this->modifySearchQuery($query);
 
         $this->processSearch($query, $request->get('filter', []));

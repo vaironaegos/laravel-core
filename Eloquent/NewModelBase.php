@@ -26,7 +26,7 @@ use Astrotech\Core\Laravel\Eloquent\Casts\UuidToIdCast;
  * @package App\Models
  *
  * @property int $id
- * @property int $external_id
+ * @property string $external_id
  *
  * @method static Builder activatedAndNotDeleted()
  */
@@ -146,6 +146,14 @@ abstract class NewModelBase extends Model
         if ($this->hasExternalId && !$model->external_id) {
             $model->external_id = Uuid::uuid4()->toString();
         }
+
+        foreach (array_keys($model->getAttributes()) as $attributeName) {
+            if (!is_array($model->{$attributeName})) {
+                continue;
+            }
+
+            $model->{$attributeName} = json_encode($model->{$attributeName});
+        }
     }
 
     /**
@@ -191,14 +199,15 @@ abstract class NewModelBase extends Model
 
         foreach ($attributes as $attributeName => $value) {
             $snakeCaseAttr = Str::snake($attributeName);
+
+            if (!$this->hasModelAttribute($snakeCaseAttr)) {
+                continue;
+            }
+
             $attributes[$snakeCaseAttr] = $value;
 
             if (isset($this->rules[$snakeCaseAttr])) {
                 $attrRule = $this->rules[$snakeCaseAttr];
-                if (is_string($value) && is_array($attrRule) && in_array('json', $attrRule)) {
-                    $attributes[$snakeCaseAttr] = json_decode($value, true);
-                }
-
                 if (is_array($attrRule) && in_array('boolean', $this->rules[$snakeCaseAttr])) {
                     $attributes[$snakeCaseAttr] = convertToBool($value);
                 }

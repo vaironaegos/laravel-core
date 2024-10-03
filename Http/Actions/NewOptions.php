@@ -30,6 +30,7 @@ trait NewOptions
             return $this->answerSuccess(Cache::get($cacheKey));
         }
 
+        /** @var Builder $query */
         $query = $model->select([$value . ' as value', $label . ' as label'])
             ->orderBy($label, 'ASC');
 
@@ -39,9 +40,16 @@ trait NewOptions
         }
 
         $this->modifyOptionsQuery($query);
+        $rows = [];
+        $query->each(function ($record) use (&$rows) {
+            $rows[] = [
+                'label' => $record->label,
+                'value' => $record->value,
+            ];
+        });
 
-        $response = $this->answerSuccess($query->get());
-        Cache::put($cacheKey, $query->get(), 120);
+        $response = $this->answerSuccess($rows);
+        Cache::put($cacheKey, $rows, 120);
 
         return $response;
     }

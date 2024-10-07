@@ -15,7 +15,7 @@ class BoundedContextStructure extends Command
     public function handle(): int
     {
         $name = ucfirst($this->argument('name'));
-        $basePath = base_path("domain/{$name}");
+        $basePath = base_path("agnostic-app/domain/{$name}");
 
         $folders = [
             'Entities',
@@ -36,7 +36,7 @@ class BoundedContextStructure extends Command
 
         $this->info("Bounded context '{$name}' created successfully!");
 
-        $sharedPath = base_path("domain/Shared");
+        $sharedPath = base_path("agnostic-app/domain/Shared");
 
         if (File::exists($sharedPath)) {
             $this->info("Bounded context '{$name}' has been created before!");

@@ -15,7 +15,7 @@ class InfraStructure extends Command
     public function handle(): int
     {
         $name = ucfirst($this->argument('name'));
-        $basePath = base_path("infrastructure/{$name}");
+        $basePath = base_path("agnostic-app/infrastructure/{$name}");
         $folders = ['Persistence', 'Queue', 'Events', 'Adapters'];
 
         foreach ($folders as $folder) {

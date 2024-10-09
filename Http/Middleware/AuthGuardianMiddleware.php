@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
 use Closure;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleClient;
@@ -56,6 +57,12 @@ final class AuthGuardianMiddleware
             return $next($request);
         } catch (RequestException $e) {
             return response()->json(['error' => 'invalidToken', 'message' => $e->getMessage()], 401);
+        } catch (ConnectException $e) {
+            return response()->json([
+                'error' => 'connectError',
+                'message' => $e->getMessage(),
+                'url' => $this->authGuardianUrl . '/users/identity'
+            ], 500);
         }
     }
 }

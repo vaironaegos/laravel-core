@@ -43,7 +43,7 @@ final class AuthGuardianMiddleware
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                return response()->json(['error' => 'Invalid token'], 401);
+                return response()->json(['error' => 'invalidToken'], 401);
             }
 
             $userInfo = json_decode((string)$response->getBody(), true);
@@ -55,7 +55,7 @@ final class AuthGuardianMiddleware
 
             return $next($request);
         } catch (RequestException $e) {
-            return response()->json(['error' => 'Invalid token'], 401);
+            return response()->json(['error' => 'invalidToken', 'message' => $e->getMessage()], 401);
         }
     }
 }

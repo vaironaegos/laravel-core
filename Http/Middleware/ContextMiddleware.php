@@ -9,6 +9,7 @@ use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 final class ContextMiddleware
 {
@@ -33,6 +34,8 @@ final class ContextMiddleware
         }
 
         app()->instance('tenant', $tenant->toArray());
+
+        // DB::connection($connection)->statement('SET search_path TO ' . $schema);
 
         $request->headers->set('X-Tenant-Id', $tenant->external_id);
         $request->headers->set('X-Tenant-Name', $tenant->name);

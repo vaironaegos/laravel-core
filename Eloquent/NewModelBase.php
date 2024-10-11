@@ -401,6 +401,18 @@ abstract class NewModelBase extends Model
         $data['id'] = $data['external_id'] ?? null;
         unset($data['external_id'], $data['deleted_at'], $data['deleted_by']);
 
+        $rules = $this->rules;
+        $fieldWithArrayRule = array_filter(array_keys($rules), function ($key) use ($rules) {
+            return is_array($rules[$key]) && in_array('array', $rules[$key]);
+        });
+
+        foreach ($fieldWithArrayRule as $fieldName) {
+            if (is_string($this->{$fieldName})) {
+                $this->{$fieldName} = json_decode($this->{$fieldName}, true);
+                $data[$fieldName] = $this->{$fieldName};
+            }
+        }
+
         foreach ($this->getCasts() as $fieldName => $castName) {
             if ($fieldName === 'id') {
                 continue;

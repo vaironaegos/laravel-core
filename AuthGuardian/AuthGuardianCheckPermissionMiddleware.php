@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Astrotech\Core\Laravel\Http\Middleware;
+namespace Astrotech\Core\Laravel\AuthGuardian;
 
 use Closure;
-use Exception;
-use Illuminate\Http\Request;
 use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Http\Request;
 
 final class AuthGuardianCheckPermissionMiddleware
 {

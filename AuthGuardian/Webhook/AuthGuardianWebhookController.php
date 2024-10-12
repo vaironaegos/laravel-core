@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Astrotech\Core\Laravel\Http\AuthGuardianWebHook;
+namespace Astrotech\Core\Laravel\AuthGuardian\Webhook;
 
-use Illuminate\Http\Request;
+use Astrotech\Core\Laravel\Http\ControllerBase;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Astrotech\Core\Laravel\Http\ControllerBase;
 
 final class AuthGuardianWebhookController extends ControllerBase
 {

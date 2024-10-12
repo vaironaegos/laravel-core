@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Astrotech\Core\Laravel\Http\AuthGuardianWebHook;
+namespace Astrotech\Core\Laravel\AuthGuardian\Webhook;
 
 use Illuminate\Support\Facades\DB;
 

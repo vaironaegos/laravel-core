@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Astrotech\Core\Laravel\Http\Middleware;
+namespace Astrotech\Core\Laravel\AuthGuardian;
 
 use Closure;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\RequestException;
-use Astrotech\Core\Laravel\AuthGuardian\AuthGuardianUser;
 
 final class AuthGuardianMiddleware
 {

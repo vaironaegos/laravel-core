@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Astrotech\Core\Laravel\Auth;
+namespace Astrotech\Core\Laravel\AuthGuardian;
 
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;

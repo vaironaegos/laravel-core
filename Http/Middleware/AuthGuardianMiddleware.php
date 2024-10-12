@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
-use Astrotech\Core\Laravel\Auth\AuthGuardianUser;
+use Astrotech\Core\Laravel\AuthGuardian\AuthGuardianUser;
 
 final class AuthGuardianMiddleware
 {

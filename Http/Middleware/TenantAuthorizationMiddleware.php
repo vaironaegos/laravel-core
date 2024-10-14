@@ -9,6 +9,7 @@ use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
@@ -51,6 +52,8 @@ final class TenantAuthorizationMiddleware
             $request->headers->set('X-Tenant-Name', $tenant->name);
             $request->headers->set('X-Tenant-Schema', $tenant->schema);
             $request->headers->set('X-Tenant-Url', $tenant->url);
+
+            DB::connection()->statement('SET search_path TO ' . $tenant->schema);
 
             return $next($request);
         } catch (SignatureInvalidException $e) {

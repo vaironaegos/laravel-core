@@ -46,14 +46,13 @@ final class TenantAuthorizationMiddleware
 
             $token = trim($explodeToken[1]);
             $tenant = Tenant::authenticateTenant($token);
+            DB::connection()->statement('SET search_path TO ' . $tenant->schema);
             app()->instance('tenant', $tenant->toSoftArray());
 
             $request->headers->set('X-Tenant-Id', $tenant->external_id);
             $request->headers->set('X-Tenant-Name', $tenant->name);
             $request->headers->set('X-Tenant-Schema', $tenant->schema);
             $request->headers->set('X-Tenant-Url', $tenant->url);
-
-            DB::connection()->statement('SET search_path TO ' . $tenant->schema);
 
             return $next($request);
         } catch (SignatureInvalidException $e) {

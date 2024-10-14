@@ -24,6 +24,7 @@ final class ContextMiddleware
             );
         }
 
+        /** @var Tenant|null $tenant */
         $tenant = Tenant::findByExternalId($contextId);
 
         if (!$tenant) {
@@ -33,9 +34,8 @@ final class ContextMiddleware
             );
         }
 
-        app()->instance('tenant', $tenant->toArray());
-
-        // DB::connection($connection)->statement('SET search_path TO ' . $schema);
+        DB::connection()->statement('SET search_path TO ' . $tenant->schema);
+        app()->instance('tenant', $tenant->toSoftArray());
 
         $request->headers->set('X-Tenant-Id', $tenant->external_id);
         $request->headers->set('X-Tenant-Name', $tenant->name);

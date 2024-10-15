@@ -9,6 +9,7 @@ use Astrotech\Core\Base\Exception\ValidationException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
@@ -45,6 +46,7 @@ final class TenantAuthorizationMiddleware
 
             $token = trim($explodeToken[1]);
             $tenant = Tenant::authenticateTenant($token);
+            DB::connection()->statement('SET search_path TO ' . $tenant->schema);
             app()->instance('tenant', $tenant->toSoftArray());
 
             $request->headers->set('X-Tenant-Id', $tenant->external_id);

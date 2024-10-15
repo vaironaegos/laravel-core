@@ -38,7 +38,8 @@ trait Create
                 record: $record,
                 field: $fieldName,
                 file: $request->file($fieldName),
-                path: $record->uploadPath
+                path: $record->uploadPath,
+                allowedExtensions: $record->allowedExtensions,
             ));
 
             unset($data[$fieldName]);

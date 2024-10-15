@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
+use Astrotech\Core\Laravel\Eloquent\Uploadable\Uploadable;
 use Astrotech\Core\Laravel\Http\Actions\Create;
 use Astrotech\Core\Laravel\Http\Actions\NewRead;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
@@ -20,6 +21,7 @@ abstract class NewCrudController extends ControllerBase
     use NewDelete;
     use NewSearch;
     use NewOptions;
+    use Uploadable;
 
     protected array $requestFields = [];
 

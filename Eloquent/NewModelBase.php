@@ -475,7 +475,7 @@ abstract class NewModelBase extends Model
      *
      * @return void
      */
-    private function populateTimestampsColumns(): void
+    protected function populateTimestampsColumns(): void
     {
         $now = new DateTimeImmutable();
 
@@ -495,7 +495,7 @@ abstract class NewModelBase extends Model
      *
      * @return void
      */
-    private function populateBlameableAttributes(): void
+    protected function populateBlameableAttributes(): void
     {
         /** @var ModelBase $user */
         $user = Auth::user();

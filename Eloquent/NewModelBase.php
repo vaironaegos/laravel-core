@@ -197,6 +197,19 @@ abstract class NewModelBase extends Model
             return parent::fill($attributes);
         }
 
+        $rules = $this->rules;
+
+        $fieldWithArrayRule = array_filter(array_keys($rules), function ($key) use ($rules) {
+            return is_array($rules[$key]) && in_array('array', $rules[$key]);
+        });
+
+        foreach ($fieldWithArrayRule as $fieldName) {
+            if (is_string($this->{$fieldName})) {
+                $data[$fieldName] = json_decode($this->{$fieldName}, true);
+                $this->setAttribute($fieldName, $data[$fieldName]);
+            }
+        }
+
         foreach ($attributes as $attributeName => $value) {
             $snakeCaseAttr = Str::snake($attributeName);
 
@@ -408,8 +421,8 @@ abstract class NewModelBase extends Model
 
         foreach ($fieldWithArrayRule as $fieldName) {
             if (is_string($this->{$fieldName})) {
-                $this->{$fieldName} = json_decode($this->{$fieldName}, true);
-                $data[$fieldName] = $this->{$fieldName};
+                $data[$fieldName] = json_decode($this->{$fieldName}, true);
+                $this->setAttribute($fieldName, $data[$fieldName]);
             }
         }
 

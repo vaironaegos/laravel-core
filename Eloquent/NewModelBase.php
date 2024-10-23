@@ -85,10 +85,10 @@ abstract class NewModelBase extends Model
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
             $model->attributes = $model->getAttributes();
+            $model->beforeSave($model);
             $validator = Validator::make($model->attributes, $model->rules);
 
             if (!$validator->fails()) {
-                $model->beforeSave($model);
                 return;
             }
 

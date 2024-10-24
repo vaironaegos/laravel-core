@@ -85,10 +85,11 @@ abstract class NewModelBase extends Model
             $model->populateBlameableAttributes();
             $model->populateTimestampsColumns();
             $model->attributes = $model->getAttributes();
-            $model->beforeSave($model);
+            $model->beforeValidation();
             $validator = Validator::make($model->attributes, $model->rules);
 
             if (!$validator->fails()) {
+                $model->beforeSave();
                 return;
             }
 
@@ -105,7 +106,7 @@ abstract class NewModelBase extends Model
 
         $afterSaveCallback = function (self $model) {
             $model->attributes = $model->getAttributes();
-            $model->afterSave($model);
+            $model->afterSave();
         };
 
         $beforeDeleteCallback = function (self $model) {
@@ -120,7 +121,7 @@ abstract class NewModelBase extends Model
                 $model->{static::DELETED_AT} = $now->format('Y-m-d H:i:s');
             }
 
-            $model->beforeDelete($model);
+            $model->beforeDelete();
         };
 
         self::creating($beforeSaveCallback);
@@ -131,55 +132,52 @@ abstract class NewModelBase extends Model
         self::saved($afterSaveCallback);
     }
 
-    /**
-     * Invoked before the saving event of a model.
-     *
-     * @param NewModelBase $model
-     * The instance of NewModelBase model.
-     */
-    protected function beforeSave(NewModelBase $model): void
+    protected function beforeValidation(): void
     {
-        if (!empty($model->getAttribute('id'))) {
+        if (!empty($this->getAttribute('id'))) {
             return;
         }
 
-        if ($this->hasExternalId && !$model->external_id) {
-            $model->external_id = Uuid::uuid4()->toString();
+        if ($this->hasExternalId && !$this->external_id) {
+            $this->external_id = Uuid::uuid4()->toString();
         }
+    }
 
-        foreach (array_keys($model->getAttributes()) as $attributeName) {
-            if (!is_array($model->{$attributeName})) {
+    /**
+     * Invoked before the saving event of a model.
+     * The instance of NewModelBase model.
+     */
+    protected function beforeSave(): void
+    {
+        foreach (array_keys($this->getAttributes()) as $attributeName) {
+            if (!is_array($this->{$attributeName})) {
                 continue;
             }
 
-            $model->{$attributeName} = json_encode($model->{$attributeName});
+            $this->{$attributeName} = json_encode($this->{$attributeName});
         }
     }
 
     /**
      * Invoked after the saving event of a model.
-     *
-     * @param NewModelBase $model
      * The instance of NewModelBase model.
      */
-    protected function afterSave(NewModelBase $model): void
+    protected function afterSave(): void
     {
-        Cache::put("{$model->getTable()}_{$model->external_id}", $model->getAttributes());
-        Cache::delete("{$model->getTable()}_collection");
-        Cache::delete("{$model->getTable()}_options");
-        Cache::delPattern("{$model->getTable()}_search*");
+        Cache::put("{$this->getTable()}_{$this->external_id}", $this->getAttributes());
+        Cache::delete("{$this->getTable()}_collection");
+        Cache::delete("{$this->getTable()}_options");
+        Cache::delPattern("{$this->getTable()}_search*");
     }
 
     /**
      * Invoked before the deleting event of a model.
-     *
-     * @param NewModelBase $model
      * The instance of NewModelBase model.
      */
-    protected function beforeDelete(NewModelBase $model): void
+    protected function beforeDelete(): void
     {
-        Cache::delete("{$model->getTable()}_{$model->external_id}");
-        Cache::delete("{$model->getTable()}_search*");
+        Cache::delete("{$this->getTable()}_{$this->external_id}");
+        Cache::delete("{$this->getTable()}_search*");
     }
 
     /**
@@ -193,8 +191,10 @@ abstract class NewModelBase extends Model
      */
     public function fill(array $attributes): static
     {
+        parent::fill($attributes);
+
         if (empty($attributes)) {
-            return parent::fill($attributes);
+            return $this;
         }
 
         $rules = $this->rules;

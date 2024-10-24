@@ -13,7 +13,8 @@ final class UnrepeatableValidator implements ValidationRule
     public function __construct(
         private readonly string $table,
         private readonly string $column,
-        private readonly int|string|null $excludeId = null
+        private readonly int|string|null $excludeId = null,
+        private readonly bool $excludeSoftDeleted = false
     ) {
     }
 
@@ -25,6 +26,10 @@ final class UnrepeatableValidator implements ValidationRule
 
         if ($this->excludeId) {
             $query->where('id', '<>', $this->excludeId);
+        }
+
+        if ($this->excludeSoftDeleted) {
+            $query->whereNull('deleted_at');
         }
 
         if ($query->exists()) {

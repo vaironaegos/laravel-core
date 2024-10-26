@@ -26,7 +26,11 @@ trait NewRead
         }
 
         $query = $modelName::where('external_id', $id);
-        $query->whereNull(['deleted_at', 'deleted_by']);
+
+        if ($record->hasModelAttribute('deleted_at')) {
+            $query->whereNull(['deleted_at', 'deleted_by']);
+        }
+
         $this->modifyReadQuery($query);
 
         /** @var NewModelBase $record */
@@ -40,10 +44,15 @@ trait NewRead
         }
 
         Cache::put($record->getTable() . '_' . $id, $record->getAttributes());
+        $this->afterRead($record);
         return $this->answerSuccess($record->toArray());
     }
 
     protected function modifyReadQuery(Builder $query): void
+    {
+    }
+
+    protected function afterRead(NewModelBase $record): void
     {
     }
 }

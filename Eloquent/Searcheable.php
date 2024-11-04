@@ -51,6 +51,33 @@ trait Searcheable
                     $value = !is_array($value) ? trim($value) : $value;
                     $operator = SearchOperator::from($operator);
 
+                    // eq (EQUALS) Logic
+                    if ($operator === SearchOperator::EQUAL) {
+                        $query->where($column, $value);
+                        continue;
+                    }
+
+                    // neq (NOT EQUALS) Logic
+                    if ($operator === SearchOperator::NOT_EQUAL) {
+                        $query->whereNot($column, '<>', $value);
+                        continue;
+                    }
+
+                    // in (IN) Logic
+                    if ($operator === SearchOperator::IN) {
+                        $values = explode(',', $value);
+                        $query->whereIn($column, $values);
+                        continue;
+                    }
+
+                    // nin (NOT IN) Logic
+                    if ($operator === SearchOperator::NOT_IN) {
+                        $values = explode(',', $value);
+                        $query->whereNotIn($column, $values);
+                        continue;
+                    }
+
+                    // like (LIKE) Logic
                     if ($operator === SearchOperator::LIKE) {
                         if ($hasRelation) {
                             if (count(explode('.', $column)) <= 2) {
@@ -92,12 +119,31 @@ trait Searcheable
                         continue;
                     }
 
-                    if ($operator === SearchOperator::IN) {
-                        $values = explode(',', $value);
-                        $query->whereIn($column, $values);
+                    // lt (LESS THAN) Logic
+                    if ($operator === SearchOperator::LESS_THAN) {
+                        $query->where($column, '<', $value);
                         continue;
                     }
 
+                    // lte (LESS THAN AND EQUAL) Logic
+                    if ($operator === SearchOperator::LESS_THAN_EQUAL) {
+                        $query->where($column, '<=', $value);
+                        continue;
+                    }
+
+                    // gt (GREATER THAN) Logic
+                    if ($operator === SearchOperator::GREATER_THAN) {
+                        $query->where($column, '>', $value);
+                        continue;
+                    }
+
+                    // gte (GREATER THAN AND EQUAL) Logic
+                    if ($operator === SearchOperator::GREATER_THAN_EQUAL) {
+                        $query->where($column, '>=', $value);
+                        continue;
+                    }
+
+                    // btw (BETWEEN) Logic
                     if ($operator === SearchOperator::BETWEEN) {
                         if ($hasRelation) {
                             $dates = explode(',', $value);
@@ -143,6 +189,7 @@ trait Searcheable
                         $query->whereBetween($column, [$date1, $date2]);
                     }
 
+                    // json (JSON) Logic
                     if ($operator === SearchOperator::JSON) {
                         $key = array_key_first($value);
                         if (str_contains($value[$key], ',')) {

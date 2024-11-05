@@ -59,7 +59,7 @@ trait Searcheable
 
                     // neq (NOT EQUALS) Logic
                     if ($operator === SearchOperator::NOT_EQUAL) {
-                        $query->whereNot($column, '<>', $value);
+                        $query->whereNot($column, $value);
                         continue;
                     }
 

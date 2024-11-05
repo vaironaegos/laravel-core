@@ -50,6 +50,32 @@ trait NewSearcheable
                     $value = !is_array($value) ? trim($value) : $value;
                     $operator = SearchOperator::from($operator);
 
+                    // eq (EQUALS) Logic
+                    if ($operator === SearchOperator::EQUAL) {
+                        $query->where($column, $value);
+                        continue;
+                    }
+
+                    // neq (NOT EQUALS) Logic
+                    if ($operator === SearchOperator::NOT_EQUAL) {
+                        $query->whereNot($column, $value);
+                        continue;
+                    }
+
+                    // in (IN) Logic
+                    if ($operator === SearchOperator::IN) {
+                        $values = explode(',', $value);
+                        $query->whereIn($column, $values);
+                        continue;
+                    }
+
+                    // nin (NOT IN) Logic
+                    if ($operator === SearchOperator::NOT_IN) {
+                        $values = explode(',', $value);
+                        $query->whereNotIn($column, $values);
+                        continue;
+                    }
+
                     if ($operator === SearchOperator::LIKE) {
                         if ($hasRelation) {
                             if (count(explode('.', $column)) <= 2) {

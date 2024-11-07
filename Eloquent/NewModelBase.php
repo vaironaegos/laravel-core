@@ -70,7 +70,6 @@ abstract class NewModelBase extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $this->populateFillableFields();
         $this->populateRulesFields();
         $this->construct();
         parent::__construct($attributes);
@@ -531,39 +530,6 @@ abstract class NewModelBase extends Model
     }
 
     /**
-     * Adds 'CREATED_AT', 'UPDATED_AT', 'DELETED_AT', 'CREATED_BY', 'UPDATED_BY', 'DELETED_BY' and others fields if
-     * necessary, to the list of fillable attributes, if these attributes exist in the model.
-     *
-     * @return void
-     */
-    private function populateFillableFields(): void
-    {
-        if ($this->hasModelAttribute(static::CREATED_AT)) {
-            $this->fillable[] = static::CREATED_AT;
-        }
-
-        if ($this->hasModelAttribute(static::CREATED_BY)) {
-            $this->fillable[] = static::CREATED_BY;
-        }
-
-        if ($this->hasModelAttribute(static::UPDATED_AT)) {
-            $this->fillable[] = static::UPDATED_AT;
-        }
-
-        if ($this->hasModelAttribute(static::UPDATED_BY)) {
-            $this->fillable[] = static::UPDATED_BY;
-        }
-
-        if ($this->hasModelAttribute(static::DELETED_AT)) {
-            $this->fillable[] = static::DELETED_AT;
-        }
-
-        if ($this->hasModelAttribute(static::DELETED_BY)) {
-            $this->fillable[] = static::DELETED_BY;
-        }
-    }
-
-    /**
      * Sets validation rules for 'CREATED_AT', 'CREATED_BY', 'UPDATED_AT', 'UPDATED_BY', 'DELETED_AT', 'DELETED_BY' and
      * others fields if necessary, attributes if they exist in the model.
      *
@@ -593,6 +559,10 @@ abstract class NewModelBase extends Model
 
         if ($this->hasModelAttribute(static::DELETED_BY)) {
             $this->rules[static::DELETED_BY] = ['nullable', 'string'];
+        }
+
+        if ($this->hasModelAttribute('active')) {
+            $this->rules['active'] = ['nullable', 'boolean'];
         }
     }
 

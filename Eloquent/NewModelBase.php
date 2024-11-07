@@ -134,6 +134,10 @@ abstract class NewModelBase extends Model
 
     protected function beforeValidation(): void
     {
+        foreach ($this->modelAttributes() as $fieldName) {
+            $this->setAttribute($fieldName, $this->getAttribute($fieldName));
+        }
+
         if (!empty($this->getAttribute('id'))) {
             return;
         }
@@ -141,6 +145,17 @@ abstract class NewModelBase extends Model
         if ($this->hasExternalId && !$this->external_id) {
             $this->external_id = Uuid::uuid4()->toString();
         }
+    }
+
+    public function getAttribute($key): mixed
+    {
+        $value = parent::getAttribute($key);
+
+        if (isset($this->rules[$key]) && in_array('array', $this->rules[$key]) && is_string($value)) {
+            return json_decode($value, true);
+        }
+
+        return parent::getAttribute($key);
     }
 
     /**
@@ -195,19 +210,6 @@ abstract class NewModelBase extends Model
 
         if (empty($attributes)) {
             return $this;
-        }
-
-        $rules = $this->rules;
-
-        $fieldWithArrayRule = array_filter(array_keys($rules), function ($key) use ($rules) {
-            return is_array($rules[$key]) && in_array('array', $rules[$key]);
-        });
-
-        foreach ($fieldWithArrayRule as $fieldName) {
-            if (is_string($this->{$fieldName})) {
-                $data[$fieldName] = json_decode($this->{$fieldName}, true);
-                $this->setAttribute($fieldName, $data[$fieldName]);
-            }
         }
 
         foreach ($attributes as $attributeName => $value) {
@@ -415,20 +417,13 @@ abstract class NewModelBase extends Model
     public function toArray(): array
     {
         $data = parent::toArray();
+
+        foreach (array_keys($data) as $fieldName) {
+            $data[$fieldName] = $this->getAttribute($fieldName);
+        }
+
         $data['id'] = $data['external_id'] ?? null;
         unset($data['external_id'], $data['deleted_at'], $data['deleted_by']);
-
-        $rules = $this->rules;
-        $fieldWithArrayRule = array_filter(array_keys($rules), function ($key) use ($rules) {
-            return is_array($rules[$key]) && in_array('array', $rules[$key]);
-        });
-
-        foreach ($fieldWithArrayRule as $fieldName) {
-            if (is_string($this->{$fieldName})) {
-                $data[$fieldName] = json_decode($this->{$fieldName}, true);
-                $this->setAttribute($fieldName, $data[$fieldName]);
-            }
-        }
 
         foreach ($this->getCasts() as $fieldName => $castName) {
             if ($fieldName === 'id') {

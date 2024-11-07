@@ -135,7 +135,11 @@ abstract class NewModelBase extends Model
     protected function beforeValidation(): void
     {
         foreach ($this->modelAttributes() as $fieldName) {
-            $this->setAttribute($fieldName, $this->getAttribute($fieldName));
+            $value = $this->getAttribute($fieldName);
+            if (is_null($value)) {
+                continue;
+            }
+            $this->setAttribute($fieldName, $value);
         }
 
         if (!empty($this->getAttribute('id'))) {

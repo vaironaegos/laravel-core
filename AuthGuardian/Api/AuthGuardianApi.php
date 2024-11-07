@@ -25,4 +25,26 @@ final class AuthGuardianApi
 
         return json_decode($response->getBody()->getContents(), true);
     }
+
+    public function deleteUser(string $userId, string $token): array
+    {
+        $response = $this->guzzleClient->delete($this->baseUrl . '/users/' . $userId, [
+            'headers' => [
+                'Authorization' => "Bearer {$token}",
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function destroyUser(string $userId, string $token): array
+    {
+        $response = $this->guzzleClient->delete($this->baseUrl . "/users/{$userId}/destroy", [
+            'headers' => [
+                'Authorization' => "Bearer {$token}",
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
 }

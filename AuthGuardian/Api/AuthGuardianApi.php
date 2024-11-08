@@ -47,4 +47,16 @@ final class AuthGuardianApi
 
         return json_decode($response->getBody()->getContents(), true);
     }
+
+    public function updateUser(string $userId, array $data, string $token): array
+    {
+        $response = $this->guzzleClient->put($this->baseUrl . "/users/{$userId}", [
+            'json' => $data,
+            'headers' => [
+                'Authorization' => "Bearer {$token}",
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
 }

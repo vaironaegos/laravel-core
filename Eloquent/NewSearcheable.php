@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use DateTimeImmutable;
 use Exception;
+use DateTimeImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -77,29 +77,36 @@ trait NewSearcheable
                     }
 
                     if ($operator === SearchOperator::LIKE) {
+                        $dbDriver = $query->getModel()->getModel()->getConnection()->getConfig()['driver'];
+                        $actualOperator = $dbDriver === 'pgsql' ? 'ILIKE' : 'LIKE';
+
                         if ($hasRelation) {
                             if (count(explode('.', $column)) <= 2) {
                                 [$relation, $column] = explode('.', $column);
                                 $relation = underscoreToCamelCase($relation);
-                                $query->whereHas($relation, function (Builder $query) use ($operator, $value, $column) {
-                                    $query->where($column, $operator->value, "%$value%");
+                                $query->whereHas($relation, function (Builder $query) use (
+                                    $actualOperator,
+                                    $value,
+                                    $column
+                                ) {
+                                    $query->where($column, $actualOperator, "%$value%");
                                 });
                                 continue;
                             }
 
                             [$relation1, $relation2, $column] = explode('.', $column);
                             $query->whereHas($relation1, function (Builder $query) use (
-                                $operator,
+                                $actualOperator,
                                 $value,
                                 $column,
                                 $relation2
                             ) {
                                 $query->whereHas($relation2, function (Builder $query) use (
-                                    $operator,
+                                    $actualOperator,
                                     $value,
                                     $column
                                 ) {
-                                    $query->where($column, $operator->value, "%$value%");
+                                    $query->where($column, $actualOperator, "%$value%");
                                 });
                             });
                             continue;

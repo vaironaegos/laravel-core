@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Astrotech\Core\Laravel\AuthGuardian\Helpers;
 
+use Illuminate\Http\JsonResponse;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Http\JsonResponse;
 
 trait AuthGuardianErrorHandler
 {
-    public function handleGuardianError(RequestException|ConnectException $exception): JsonResponse
-    {
+    public function handleGuardianError(
+        RequestException|ConnectException $exception,
+        bool $returnJsonResponse = true
+    ): JsonResponse|array {
         if ($exception instanceof RequestException) {
             $statusCode = $exception->getResponse()->getStatusCode();
             $responsePayload = json_decode($exception->getResponse()->getBody()->getContents(), true);
@@ -24,6 +28,10 @@ trait AuthGuardianErrorHandler
             ], $exception->getResponse()->getStatusCode());
         }
 
-        return response()->json(['error' => 'connectError', 'message' => $exception->getMessage()], 500);
+        $details = ['error' => 'connectError', 'message' => $exception->getMessage()];
+
+        return $returnJsonResponse ?
+            response()->json($details, 500) :
+            $details;
     }
 }

@@ -45,16 +45,14 @@ trait Uploadable
             return;
         }
 
-        if (request()->hasFile($data->field)) {
-            $extension = $data->file->getClientOriginalExtension();
+        $extension = $data->file->getClientOriginalExtension();
 
-            if (!in_array($extension, $data->allowedExtensions)) {
-                throw new ValidationException(["field" => $data->field, "error" => 'invalidExtension']);
-            }
-
-            $fileName = uniqid(date('HisYmd')) . '.' . $extension;
-            $data->file->storeAs($data->path, $fileName, 'public');
-            $data->record->{$data->field} = $fileName;
+        if (!in_array($extension, $data->allowedExtensions)) {
+            throw new ValidationException(["field" => $data->field, "error" => 'invalidExtension']);
         }
+
+        $fileName = uniqid(date('HisYmd')) . '.' . $extension;
+        $data->file->storeAs($data->path, $fileName, 'public');
+        $data->record->{$data->field} = $fileName;
     }
 }

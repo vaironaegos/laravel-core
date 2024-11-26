@@ -6,12 +6,15 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Astrotech\Core\Laravel\Utils\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
-use Astrotech\Core\Laravel\Utils\Cache;
+use Astrotech\Core\Laravel\Eloquent\NewSearcheable;
 
 trait NewOptions
 {
+    use NewSearcheable;
+
     public function options(Request $request): JsonResponse
     {
         $value = $request->get('value', 'external_id');
@@ -39,6 +42,7 @@ trait NewOptions
                 ->whereNull('deleted_at');
         }
 
+        $this->processSearch($query, $request->get('filter', []));
         $this->modifyOptionsQuery($query);
         $rows = [];
         $query->each(function ($record) use (&$rows) {

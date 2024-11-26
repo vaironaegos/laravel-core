@@ -62,6 +62,30 @@ trait NewSearcheable
                         continue;
                     }
 
+                    // lt (LESS THAN) Logic
+                    if ($operator === SearchOperator::LESS_THAN) {
+                        $query->where($column, '<', $value);
+                        continue;
+                    }
+
+                    // lte (LESS THAN AND EQUAL) Logic
+                    if ($operator === SearchOperator::LESS_THAN_EQUAL) {
+                        $query->where($column, '<=', $value);
+                        continue;
+                    }
+
+                    // gt (GREATER THAN) Logic
+                    if ($operator === SearchOperator::GREATER_THAN) {
+                        $query->where($column, '>', $value);
+                        continue;
+                    }
+
+                    // gte (GREATER THAN AND EQUAL) Logic
+                    if ($operator === SearchOperator::GREATER_THAN_EQUAL) {
+                        $query->where($column, '>=', $value);
+                        continue;
+                    }
+
                     // in (IN) Logic
                     if ($operator === SearchOperator::IN) {
                         $values = explode(',', $value);

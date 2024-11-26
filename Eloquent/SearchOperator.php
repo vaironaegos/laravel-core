@@ -15,6 +15,8 @@ enum SearchOperator: string
     case GREATER_THAN = 'gt';
     case LESS_THAN_EQUAL = 'lte';
     case GREATER_THAN_EQUAL = 'gte';
+    case GREATER_THAN_OR_NULL = 'gtn';
+    case LESSER_THAN_OR_NULL = 'ltn';
     case BETWEEN = 'btw';
     case JSON = 'json';
 }

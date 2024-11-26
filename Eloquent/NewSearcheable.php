@@ -68,9 +68,18 @@ trait NewSearcheable
                         continue;
                     }
 
-                    // lte (LESS THAN AND EQUAL) Logic
+                    // lte (LESS THAN OR EQUAL) Logic
                     if ($operator === SearchOperator::LESS_THAN_EQUAL) {
                         $query->where($column, '<=', $value);
+                        continue;
+                    }
+
+                    // ltn (LESSER THAN OR NULL) Logic
+                    if ($operator === SearchOperator::GREATER_THAN) {
+                        $query->where(function ($query) use ($column, $value) {
+                            $query->whereNull($column)
+                                ->orWhere($column, '<', $value);
+                        });
                         continue;
                     }
 
@@ -80,9 +89,18 @@ trait NewSearcheable
                         continue;
                     }
 
-                    // gte (GREATER THAN AND EQUAL) Logic
+                    // gte (GREATER THAN OR EQUAL) Logic
                     if ($operator === SearchOperator::GREATER_THAN_EQUAL) {
                         $query->where($column, '>=', $value);
+                        continue;
+                    }
+
+                    // gtn (GREATER THAN OR NULL) Logic
+                    if ($operator === SearchOperator::GREATER_THAN_OR_NULL) {
+                        $query->where(function ($query) use ($column, $value) {
+                            $query->whereNull($column)
+                                ->orWhere($column, '>', $value);
+                        });
                         continue;
                     }
 

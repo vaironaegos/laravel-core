@@ -6,10 +6,10 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Astrotech\Core\Laravel\Utils\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
-use Astrotech\Core\Laravel\Utils\Cache;
 
 trait NewRead
 {
@@ -18,7 +18,7 @@ trait NewRead
         /** @var NewModelBase $record */
         $modelName = $this->modelClassName();
         $record = new $modelName();
-        $cacheKey = $record->getTable() . '_' . $id;
+        $cacheKey = $this->cacheKeyBase() . '_' . $id;
 
         if (Cache::has($cacheKey)) {
             $record->fill(Cache::get($cacheKey));
@@ -43,7 +43,7 @@ trait NewRead
             );
         }
 
-        Cache::put($record->getTable() . '_' . $id, $record->getAttributes());
+        Cache::put($cacheKey, $record->getAttributes());
         $this->afterRead($record);
         return $this->answerSuccess($record->toArray());
     }

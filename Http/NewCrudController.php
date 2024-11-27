@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http;
 
-use Astrotech\Core\Laravel\Eloquent\Uploadable\Uploadable;
 use Astrotech\Core\Laravel\Http\Actions\Create;
 use Astrotech\Core\Laravel\Http\Actions\NewRead;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
@@ -12,6 +11,7 @@ use Astrotech\Core\Laravel\Http\Actions\NewDelete;
 use Astrotech\Core\Laravel\Http\Actions\NewSearch;
 use Astrotech\Core\Laravel\Http\Actions\NewUpdate;
 use Astrotech\Core\Laravel\Http\Actions\NewOptions;
+use Astrotech\Core\Laravel\Eloquent\Uploadable\Uploadable;
 
 abstract class NewCrudController extends ControllerBase
 {
@@ -41,5 +41,12 @@ abstract class NewCrudController extends ControllerBase
 
     protected function afterSoftDelete(NewModelBase $record): void
     {
+    }
+
+    protected function cacheKeyBase(): string
+    {
+        $modelName = $this->modelClassName();
+        $model = new $modelName();
+        return $model->getTable();
     }
 }

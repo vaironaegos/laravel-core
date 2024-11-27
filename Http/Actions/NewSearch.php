@@ -6,13 +6,13 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Astrotech\Core\Laravel\Utils\Cache;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Eloquent\Limitable;
 use Astrotech\Core\Laravel\Eloquent\Sorteable;
 use Astrotech\Core\Laravel\Eloquent\Paginatable;
 use Astrotech\Core\Laravel\Eloquent\NewSearcheable;
-use Astrotech\Core\Laravel\Utils\Cache;
-use Illuminate\Support\Facades\Response;
 
 trait NewSearch
 {
@@ -25,7 +25,7 @@ trait NewSearch
     {
         $modelName = $this->modelClassName();
         $model = new $modelName();
-        $cacheKey = $model->getTable() . '_search_' . $request->getQueryString() . $cacheAppend;
+        $cacheKey = $this->cacheKeyBase() . '_search_' . $request->getQueryString() . $cacheAppend;
 
         if (Cache::has($cacheKey)) {
             return Response::json(Cache::get($cacheKey));

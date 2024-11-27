@@ -27,7 +27,8 @@ trait NewOptions
         /** @var NewModelBase $model */
         $modelName = $this->modelClassName();
         $model = new $modelName();
-        $cacheKey = $model->getTable() . '_options';
+        $queryStringAppend = $request->getQueryString() ? "_$request->getgetQueryString" : '';
+        $cacheKey = $this->cacheKeyBase() . '_options' . $queryStringAppend;
 
         if (Cache::has($cacheKey)) {
             return $this->answerSuccess(Cache::get($cacheKey));

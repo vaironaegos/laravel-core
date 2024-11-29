@@ -12,15 +12,22 @@ final class AuthGuardianApi
         private readonly string $baseUrl,
         private readonly string $clientId,
         private readonly string $clientSecret,
-        private readonly GuzzleClient $guzzleClient
+        private readonly GuzzleClient $guzzleClient,
+        private array $headers = []
     ) {
+    }
+
+    public function addHeader(string $name, string $value): void
+    {
+        $this->headers[$name] = $value;
     }
 
     public function createUser(array $data): array
     {
         $response = $this->guzzleClient->post($this->baseUrl . '/users/with-password', [
             'json' => $data,
-            'auth' => [$this->clientId, $this->clientSecret]
+            'auth' => [$this->clientId, $this->clientSecret],
+            'headers' => $this->headers
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
@@ -30,6 +37,7 @@ final class AuthGuardianApi
     {
         $response = $this->guzzleClient->delete($this->baseUrl . '/users/' . $userId, [
             'headers' => [
+                ...$this->headers,
                 'Authorization' => "Bearer {$token}",
             ]
         ]);
@@ -41,6 +49,7 @@ final class AuthGuardianApi
     {
         $response = $this->guzzleClient->delete($this->baseUrl . "/users/{$userId}/destroy", [
             'headers' => [
+                ...$this->headers,
                 'Authorization' => "Bearer {$token}",
             ]
         ]);
@@ -53,6 +62,7 @@ final class AuthGuardianApi
         $response = $this->guzzleClient->put($this->baseUrl . "/users/{$userId}", [
             'json' => $data,
             'headers' => [
+                ...$this->headers,
                 'Authorization' => "Bearer {$token}",
             ]
         ]);

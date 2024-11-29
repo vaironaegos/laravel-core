@@ -39,6 +39,7 @@ final class AuthGuardianMiddleware
             $response = $this->guzzleClient->get($this->authGuardianUrl . '/users/identity', [
                 'headers' => [
                     'Authorization' => "Bearer {$token}",
+                    'Origin' => $request->header('Origin'),
                 ]
             ]);
 

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
  * @property string $id
+ * @property string $external_id
  * @property string $name
  * @property string $email
  * @property string $login

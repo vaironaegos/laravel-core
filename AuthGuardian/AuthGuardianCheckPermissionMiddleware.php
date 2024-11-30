@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\AuthGuardian;
 
 use Closure;
+use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,7 @@ final class AuthGuardianCheckPermissionMiddleware
             $response = $this->guzzleClient->get($this->authGuardianUrl . '/users/has-permission?key=' . $key, [
                 'headers' => [
                     'Authorization' => "Bearer {$token}",
+                    'Origin' => $request->header('Origin'),
                 ]
             ]);
             $userInfo = json_decode((string)$response->getBody(), true);

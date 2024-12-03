@@ -107,6 +107,20 @@ trait NewSearcheable
                     // in (IN) Logic
                     if ($operator === SearchOperator::IN) {
                         $values = explode(',', $value);
+                        if ($hasRelation) {
+                            if (count(explode('.', $column)) <= 2) {
+                                [$relation, $column] = explode('.', $column);
+                                $relation = underscoreToCamelCase($relation);
+                                $query->whereHas($relation, function (Builder $query) use (
+                                    $values,
+                                    $column
+                                ) {
+                                    $query->whereIn($column, $values);
+                                });
+                                continue;
+                            }
+                        }
+
                         $query->whereIn($column, $values);
                         continue;
                     }

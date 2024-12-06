@@ -43,6 +43,12 @@ trait NewSearcheable
 
             if (is_array($param)) {
                 foreach ($param as $operator => $value) {
+                    // nn (NOT_NULL) logic
+                    if ($operator === SearchOperator::NOT_NULL->value) {
+                        $query->whereNotNull($column);
+                        continue;
+                    }
+
                     if (empty($value)) {
                         continue;
                     }

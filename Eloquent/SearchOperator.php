@@ -19,4 +19,5 @@ enum SearchOperator: string
     case LESSER_THAN_OR_NULL = 'ltn';
     case BETWEEN = 'btw';
     case JSON = 'json';
+    case NOT_NULL = 'nn';
 }

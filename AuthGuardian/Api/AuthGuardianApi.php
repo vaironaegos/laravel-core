@@ -57,7 +57,7 @@ final class AuthGuardianApi
         $response = $this->executeRequest('POST', $this->baseUrl . '/users/with-password', [
             'json' => $data,
             'auth' => [$this->clientId, $this->clientSecret],
-            'headers' =>[
+            'headers' => [
                 ...$this->headers,
                 'Origin' => $request->header('Origin'),
             ],
@@ -66,9 +66,9 @@ final class AuthGuardianApi
         return $response;
     }
 
-    public function deleteUser(string $userId, string $token,Request $request): array
+    public function deleteUser(string $userId, string $token, Request $request): array
     {
-        return $this->executeRequest('DELETE',$this->baseUrl . '/users/' . $userId, [
+        return $this->executeRequest('DELETE', $this->baseUrl . '/users/' . $userId, [
             'headers' => [
                 ...$this->headers,
                 'Authorization' => "Bearer {$token}",
@@ -79,7 +79,7 @@ final class AuthGuardianApi
 
     public function destroyUser(string $userId, string $token, Request $request): array
     {
-        return $this->executeRequest('DELETE',$this->baseUrl .
+        return $this->executeRequest('DELETE', $this->baseUrl .
             "/users/{$userId}/destroy", [
             'headers' => [
                 ...$this->headers,
@@ -89,10 +89,10 @@ final class AuthGuardianApi
         ]);
     }
 
-    public function updateUser(string $userId, array $data, string $token,string $origin): array
+    public function updateUser(string $userId, array $data, string $token, string $origin): array
     {
 
-        return $this->executeRequest('PUT',$this->baseUrl . "/users/{$userId}", [
+        return $this->executeRequest('PUT', $this->baseUrl . "/users/{$userId}", [
             'json' => $data,
             'headers' => [
                 ...$this->headers,

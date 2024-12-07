@@ -20,6 +20,10 @@ final class UnrepeatableValidator implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (is_null($value)) {
+            return;
+        }
+
         $query = DB::table($this->table)
             ->select('id')
             ->where($this->column, $value);

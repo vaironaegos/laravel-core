@@ -53,7 +53,6 @@ final class AuthGuardianApi
 
     public function createUser(array $data, Request $request): array
     {
-
         $response = $this->executeRequest('POST', $this->baseUrl . '/users/with-password', [
             'json' => $data,
             'auth' => [$this->clientId, $this->clientSecret],

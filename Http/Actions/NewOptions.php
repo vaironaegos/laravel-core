@@ -39,8 +39,7 @@ trait NewOptions
             ->orderBy($label, 'ASC');
 
         if ($model->hasModelAttribute('deleted_at')) {
-            $query->whereNull('deleted_at')
-                ->whereNull('deleted_at');
+            $query->whereNull('deleted_at');
         }
 
         $this->processSearch($query, $request->get('filter', []));

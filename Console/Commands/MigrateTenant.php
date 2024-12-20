@@ -31,7 +31,7 @@ final class MigrateTenant extends Command
 
         if (empty($schemaExists)) {
             $this->info("Schema '{$schema}' does not exists! Creating...");
-            DB::connection($connection)->statement('CREATE SCHEMA ' . $schema);
+            DB::connection($connection)->statement('CREATE SCHEMA "' . $schema . '"');
             $this->info('New schema created!');
         }
 
@@ -49,10 +49,10 @@ final class MigrateTenant extends Command
 
         if ($this->option('fresh')) {
             $this->info("Dropping schema '{$schema}'...");
-            DB::connection($connection)->statement("DROP SCHEMA IF EXISTS {$schema} CASCADE");
+            DB::connection($connection)->statement('DROP SCHEMA IF EXISTS "' . $schema . '" CASCADE');
             $this->info("Schema deleted!");
             $this->info("Create schema '{$schema}'...");
-            DB::connection($connection)->statement("CREATE SCHEMA {$schema}");
+            DB::connection($connection)->statement('CREATE SCHEMA "' . $schema . '"');
             $this->info("Schema created!");
         }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\AuthGuardian\Api;
 
-use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client as GuzzleClient;
 
 final class AuthGuardianApi
 {
@@ -91,9 +91,19 @@ final class AuthGuardianApi
 
     public function updateUser(string $userId, array $data, string $token, string $origin): array
     {
-
         return $this->executeRequest('PUT', $this->baseUrl . "/users/{$userId}", [
             'json' => $data,
+            'headers' => [
+                ...$this->headers,
+                'Authorization' => "Bearer {$token}",
+                'Origin' => $origin,
+            ]
+        ]);
+    }
+
+    public function readUser(string $userId, string $token, string $origin): array
+    {
+        return $this->executeRequest('GET', $this->baseUrl . "/users/{$userId}", [
             'headers' => [
                 ...$this->headers,
                 'Authorization' => "Bearer {$token}",

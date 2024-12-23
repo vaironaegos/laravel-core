@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 final class MigrateTenant extends Command
 {
-    protected $signature = 'migrate:tenant {schema} {connection=pgsql} {--fresh} {--force}';
+    protected $signature = 'schema:migrate {schema} {connection=pgsql} {--fresh} {--force}';
     protected $description = 'Run migrations for a specific tenant schema';
 
     public function handle(): void

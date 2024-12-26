@@ -53,8 +53,7 @@ final class AuthGuardianApi
 
     public function createUser(array $data, Request $request): array
     {
-
-        $response = $this->executeRequest('POST', $this->baseUrl . '/users/with-password', [
+        return $this->executeRequest('POST', $this->baseUrl . '/users/with-password', [
             'json' => $data,
             'auth' => [$this->clientId, $this->clientSecret],
             'headers' => [
@@ -62,8 +61,6 @@ final class AuthGuardianApi
                 'Origin' => $request->header('Origin'),
             ],
         ]);
-
-        return $response;
     }
 
     public function deleteUser(string $userId, string $token, Request $request): array

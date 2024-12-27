@@ -108,4 +108,26 @@ final class AuthGuardianApi
             ]
         ]);
     }
+
+    public function checkLoginAvailable(string $login, string $token, string $origin): array
+    {
+        return $this->executeRequest('GET', $this->baseUrl . "/users/verify?login={$login}", [
+            'headers' => [
+                ...$this->headers,
+                'Authorization' => "Bearer {$token}",
+                'Origin' => $origin,
+            ]
+        ]);
+    }
+
+    public function findUserByLogin(string $login, string $token, string $origin): array
+    {
+        return $this->executeRequest('GET', $this->baseUrl . "/users?filter[login]={$login}", [
+            'headers' => [
+                ...$this->headers,
+                'Authorization' => "Bearer {$token}",
+                'Origin' => $origin,
+            ]
+        ]);
+    }
 }

@@ -603,17 +603,44 @@ abstract class NewModelBase extends Model
 
     public static function findByExternalId(string $externalId): ?self
     {
-        return static::where('external_id', $externalId)
-            ->whereNull(['deleted_at', 'deleted_by'])
-            ->first();
+        $model = new static();
+        $cacheKey = "{$model->getTable()}_{$externalId}";
+
+        if (Cache::has($cacheKey)) {
+            $model->fill(Cache::get($cacheKey));
+            return $model;
+        }
+
+        $query = $model->where('external_id', $externalId);
+
+        if ($model->hasModelAttribute('deleted_at')) {
+            $query->whereNull('deleted_at');
+        }
+
+        if ($model->hasModelAttribute('deleted_by')) {
+            $query->whereNull('deleted_by');
+        }
+
+        $record = $query->first();
+        Cache::forever($cacheKey, $record->getAttributes());
+        return $record;
     }
+
 
     public static function getIdFromExternalId(string $externalId): ?int
     {
-        return self::where('external_id', $externalId)
-            ->whereNull(['deleted_at', 'deleted_by'])
-            ->select('id')
-            ->first()?->id;
+        $model = new static();
+        $query = $model->select('id')->where('external_id', $externalId);
+
+        if ($model->hasModelAttribute('deleted_at')) {
+            $query->whereNull('deleted_at');
+        }
+
+        if ($model->hasModelAttribute('deleted_by')) {
+            $query->whereNull('deleted_by');
+        }
+
+        return $query->first()?->id;
     }
 
     public function scopeActivatedAndNotDeleted(Builder $query): Builder

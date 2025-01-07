@@ -50,16 +50,13 @@ final class AuthGuardianMiddleware
             $userInfo = json_decode((string)$response->getBody(), true);
             Auth::setUser(new AuthGuardianUser($userInfo['data']));
 
-            $extraFields = $userInfo['data']['extraFields'];
-
-            if (is_array($extraFields)) {
-                $extraFields = json_encode($extraFields);
-            }
-
             $request->headers->set('X-User-Id', $userInfo['data']['id']);
             $request->headers->set('X-User-Name', $userInfo['data']['name']);
             $request->headers->set('X-User-Login', $userInfo['data']['login']);
-            $request->headers->set('X-User-Extra-Fields', $extraFields);
+            $request->headers->set('X-Group-Id', $userInfo['data']['group']['id']);
+            $request->headers->set('X-Group-Is-Admin', $userInfo['data']['group']['isAdmin'] ? '1' : '0');
+            $request->headers->set('X-Group-Permissions', $userInfo['data']['group']['permissions']);
+            $request->headers->set('X-User-Extra-Fields', $userInfo['data']['extraFields']);
 
             return $next($request);
         } catch (RequestException $e) {

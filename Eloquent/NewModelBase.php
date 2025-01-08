@@ -622,7 +622,11 @@ abstract class NewModelBase extends Model
         }
 
         $record = $query->first();
-        Cache::forever($cacheKey, $record->getAttributes());
+
+        if ($record) {
+            Cache::forever($cacheKey, $record->getAttributes());
+        }
+
         return $record;
     }
 

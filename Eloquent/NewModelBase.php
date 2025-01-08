@@ -607,6 +607,7 @@ abstract class NewModelBase extends Model
         $cacheKey = "{$model->getTable()}_{$externalId}";
 
         if (Cache::has($cacheKey)) {
+            $model->exists = true;
             $model->fill(Cache::get($cacheKey));
             return $model;
         }
@@ -624,12 +625,12 @@ abstract class NewModelBase extends Model
         $record = $query->first();
 
         if ($record) {
+            $record->exists = true;
             Cache::forever($cacheKey, $record->getAttributes());
         }
 
         return $record;
     }
-
 
     public static function getIdFromExternalId(string $externalId): ?int
     {

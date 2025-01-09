@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 use Astrotech\Core\Laravel\Eloquent\NewModelBase;
+use Astrotech\Core\Laravel\AuthGuardian\AuthGuardianUser;
 
 trait NewDelete
 {
@@ -33,9 +34,10 @@ trait NewDelete
         }
 
         $now = new DateTimeImmutable();
+        /** @var AuthGuardianUser $user */
         $user = auth('api')->user();
-        $username = $user?->name ?? 'anonymous';
-        $id = $user?->external_id ? " [$user->external_id]" : '';
+        $username = $user->name ?? 'anonymous';
+        $id = $user->external_id ? " [$user->external_id]" : '';
         $data['deleted_at'] = $now->format('Y-m-d H:i:s');
         $data['deleted_by'] = "{$username}{$id}";
 

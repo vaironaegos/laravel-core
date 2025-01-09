@@ -266,7 +266,7 @@ abstract class NewModelBase extends Model
      */
     public function addRules(array $rules): void
     {
-        if ($this->hasModelAttribute('external_id')) {
+        if ($this->hasModelAttribute('external_id') && $this->hasExternalId) {
             $this->rules['external_id'] = ['required', 'string', 'size:36'];
         }
 

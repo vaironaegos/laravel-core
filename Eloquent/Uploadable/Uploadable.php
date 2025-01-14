@@ -41,7 +41,6 @@ trait Uploadable
         }
 
         if (is_string($data->file)) {
-            unset($data->record[$data->field]);
             return;
         }
 

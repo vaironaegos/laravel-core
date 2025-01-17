@@ -39,13 +39,13 @@ final class MailTest extends Command
             $this->info('Sending email...');
 
             /** @var SentMessage $emailInformation */
-            $emailInformation = Mail::to('dersonsena@gmail.com')->send(new MailTestMessage(
+            $emailInformation = Mail::to('devs@astrotech.solutions')->send(new MailTestMessage(
                 fromEmail: config('mail.from.address'),
                 fromName: 'Auth Guardian',
             ));
 
             if (!$emailInformation) {
-                $this->info('Erro on send email:');
+                $this->info('Error on send email:');
                 $this->info('Message: ' . $emailInformation->getMessage()->toString());
                 $this->info('Debug: ' . $emailInformation->getDebug());
                 return Command::FAILURE;
@@ -55,7 +55,8 @@ final class MailTest extends Command
             $this->info('Debug: ' . $emailInformation->getDebug());
             return Command::SUCCESS;
         } catch (Throwable $e) {
-            throw $e;
+            echo $e->getMessage();
+            return Command::FAILURE;
         }
     }
 }

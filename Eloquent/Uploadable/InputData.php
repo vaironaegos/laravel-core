@@ -16,7 +16,9 @@ final class InputData extends DtoBase
         public readonly mixed $file,
         public readonly string $path,
         public readonly array $allowedExtensions = ['jpg', 'jpeg', 'png'],
-        public readonly bool $multiple = false
+        public readonly bool $multiple = false,
+        public readonly ?string $requestField = null,
+        public readonly ?string $base64 = null
     ) {
     }
 }

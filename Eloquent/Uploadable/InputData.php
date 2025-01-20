@@ -18,7 +18,8 @@ final class InputData extends DtoBase
         public readonly array $allowedExtensions = ['jpg', 'jpeg', 'png'],
         public readonly bool $multiple = false,
         public readonly ?string $requestField = null,
-        public readonly ?string $base64 = null
+        public readonly ?string $base64 = null,
+        public readonly ?string $filename = null,
     ) {
     }
 }

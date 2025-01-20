@@ -37,7 +37,9 @@ trait Uploadable
                     ]);
                 }
 
-                $fileName = uniqid(date('HisYmd')) . '.' . $extension;
+                $fileName = $data->filename ?? uniqid(date('HisYmd'));
+                $fileName .= '.' . $extension;
+
                 $file->storeAs($data->path, $fileName, 'public');
                 array_push($filesNames, $fileName);
             }
@@ -86,8 +88,8 @@ trait Uploadable
             true
         );
 
-        $extension = $file->extension();
-        $fileName = uniqid(date('HisYmd')) . '.' . $extension;
+        $fileName = $data->filename ?? uniqid(date('HisYmd'));
+        $fileName .= '.' . $file->extension();
 
         $file->storeAs($data->path, $fileName, 'public');
         $data->record->{$data->field} = $fileName;

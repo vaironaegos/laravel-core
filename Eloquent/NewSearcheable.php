@@ -81,7 +81,7 @@ trait NewSearcheable
                     }
 
                     // ltn (LESSER THAN OR NULL) Logic
-                    if ($operator === SearchOperator::GREATER_THAN) {
+                    if ($operator === SearchOperator::LESSER_THAN_OR_NULL) {
                         $query->where(function ($query) use ($column, $value) {
                             $query->whereNull($column)
                                 ->orWhere($column, '<', $value);

@@ -61,10 +61,7 @@ final class AuthGuardianMiddleware
             return $next($request);
         } catch (RequestException $e) {
             $responsePayload = json_decode($e->getResponse()->getBody()->getContents(), true);
-            return response()->json([
-                'error' => $responsePayload['data']['error'],
-                'message' => $responsePayload['data']['message']
-            ], 401);
+            return response()->json($responsePayload, 401);
         } catch (ConnectException $e) {
             return response()->json([
                 'error' => 'connectError',

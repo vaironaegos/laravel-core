@@ -13,14 +13,26 @@ final class Cors
     public function handle(Request $request, Closure $next)
     {
         $origin = $request->headers->get('Origin');
-        $allowedOrigins = [$origin];
+
+        $allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://localhost',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:5173',
+            'http://127.0.0.1',
+        ];
 
         if (config('app.cors.allowed_origins') !== null) {
-            $allowedOrigins = config('app.cors.allowed_origins');
+            $allowedOrigins = array_merge($allowedOrigins, config('app.cors.allowed_origins'));
         }
 
-        if (!$origin || !in_array($origin, $allowedOrigins)) {
-            return response()->json(['error' => 'originNotAllowed'], 403);
+        if (!$origin) {
+            return response()->json(['error' => 'undefinedOriginHeader'], 403);
+        }
+
+        if (!in_array($origin, $allowedOrigins)) {
+            return response()->json(['error' => 'originNotAllowed', 'origin' => $origin], 403);
         }
 
         $allowedHeaders = [
@@ -68,8 +80,8 @@ final class Cors
         $response->header('Access-Control-Allow-Origin', $origin)
             ->header('Access-Control-Allow-Methods', "PUT, PATCH, HEADERS, POST, DELETE, GET, OPTIONS")
             ->header('Access-Control-Allow-Headers', implode(",", $allowedHeaders))
-            ->header('Access-Control-Allow-Credentials', "true")
-            ->header('Access-Control-Expose-Headers', implode(",", $exposedHeaders));
+            ->header('Access-Control-Expose-Headers', implode(",", $exposedHeaders))
+            ->header('Access-Control-Allow-Credentials', "true");
 
         if ($request->getMethod() === 'OPTIONS') {
             $response->setStatusCode(204);

@@ -25,7 +25,11 @@ trait NewSearch
     {
         $modelName = $this->modelClassName();
         $model = new $modelName();
-        $cacheKey = $this->cacheKeyBase() . '_search_' . $request->getQueryString() . $cacheAppend;
+        $cacheKey = $model->getTable() . '_search_' . $request->getQueryString() . $cacheAppend;
+
+        if (method_exists($this, 'cacheKeyBase')) {
+            $cacheKey = $this->cacheKeyBase() . '_search_' . $request->getQueryString() . $cacheAppend;
+        }
 
         if (Cache::has($cacheKey)) {
             return Response::json(Cache::get($cacheKey));

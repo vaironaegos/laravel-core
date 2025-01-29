@@ -18,7 +18,11 @@ trait NewRead
         /** @var NewModelBase $record */
         $modelName = $this->modelClassName();
         $record = new $modelName();
-        $cacheKey = $this->cacheKeyBase() . '_' . $id;
+        $cacheKey = $record->getTable() . '_' . $id;
+
+        if (method_exists($this, 'cacheKeyBase')) {
+            $cacheKey = $this->cacheKeyBase() . '_' . $id;
+        }
 
         if (Cache::has($cacheKey)) {
             $record->fill(Cache::get($cacheKey));

@@ -51,6 +51,22 @@ final class AuthGuardianApi
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    public function signIn(string $login, string $password, Request $request): array
+    {
+        return $this->executeRequest('POST', $this->baseUrl . '/oauth/token', [
+            'json' => [
+                'grant_type' => 'client_credentials',
+                'login' => $login,
+                'password' => $password,
+            ],
+            'auth' => [$this->clientId, $this->clientSecret],
+            'headers' => [
+                ...$this->headers,
+                'Origin' => $request->header('Origin'),
+            ],
+        ]);
+    }
+
     public function createUser(array $data, Request $request): array
     {
         return $this->executeRequest('POST', $this->baseUrl . '/users/with-password', [
@@ -60,6 +76,18 @@ final class AuthGuardianApi
                 ...$this->headers,
                 'Origin' => $request->header('Origin'),
             ],
+        ]);
+    }
+
+    public function updateUser(string $userId, array $data, string $token, Request $request): array
+    {
+        return $this->executeRequest('PUT', $this->baseUrl . "/users/{$userId}", [
+            'json' => $data,
+            'headers' => [
+                ...$this->headers,
+                'Authorization' => "Bearer {$token}",
+                'Origin' => $request->header('Origin'),
+            ]
         ]);
     }
 
@@ -82,18 +110,6 @@ final class AuthGuardianApi
                 ...$this->headers,
                 'Authorization' => "Bearer {$token}",
                 'Origin' => $request->header('Origin'),
-            ]
-        ]);
-    }
-
-    public function updateUser(string $userId, array $data, string $token, string $origin): array
-    {
-        return $this->executeRequest('PUT', $this->baseUrl . "/users/{$userId}", [
-            'json' => $data,
-            'headers' => [
-                ...$this->headers,
-                'Authorization' => "Bearer {$token}",
-                'Origin' => $origin,
             ]
         ]);
     }

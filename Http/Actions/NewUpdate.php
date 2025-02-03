@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Actions;
 
+use Astrotech\Core\Laravel\Eloquent\Uploadable\InputData;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Astrotech\Core\Laravel\Http\HttpStatus;
@@ -14,13 +15,6 @@ trait NewUpdate
     public function update(Request $request, string $id): JsonResponse
     {
         $data = empty($this->requestFields) ? $request->all() : $request->only($this->requestFields);
-
-        foreach ($this->requestFields as $fieldName) {
-            if (!$request->hasFile($fieldName)) {
-                continue;
-            }
-            $data[$fieldName] = $request->file($fieldName)->getContent();
-        }
 
         if (!$data) {
             return $this->answerFail(['error' => 'emptyPayload']);
@@ -37,6 +31,22 @@ trait NewUpdate
                 data: ['field' => 'id', 'error' => 'recordNotFound'],
                 code: HttpStatus::NOT_FOUND
             );
+        }
+
+        foreach ($this->requestFields as $fieldName) {
+            if (!$request->hasFile($fieldName)) {
+                continue;
+            }
+
+            $this->processImage(new InputData(
+                record: $record,
+                field: $fieldName,
+                file: $request->file($fieldName),
+                path: $record->uploadPath,
+                allowedExtensions: $record->allowedExtensions,
+            ));
+
+            unset($data[$fieldName]);
         }
 
         if (isset($data['password']) && empty($data['password'])) {

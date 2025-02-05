@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\AuthGuardian;
 
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 final class AuthGuardianMiddleware
 {
@@ -56,7 +56,7 @@ final class AuthGuardianMiddleware
             $request->headers->set('X-Group-Id', $userInfo['data']['group']['id']);
             $request->headers->set('X-Group-Is-Admin', $userInfo['data']['group']['isAdmin'] ? '1' : '0');
             $request->headers->set('X-Group-Permissions', $userInfo['data']['group']['permissions']);
-            $request->headers->set('X-User-Extra-Fields', $userInfo['data']['extraFields']);
+            $request->headers->set('X-User-Extra-Fields', json_encode($userInfo['data']['extraFields']));
 
             return $next($request);
         } catch (RequestException $e) {

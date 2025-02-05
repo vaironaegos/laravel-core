@@ -185,7 +185,7 @@ abstract class NewModelBase extends Model
     {
         Cache::put("{$this->getTable()}_{$this->external_id}", $this->getAttributes());
         Cache::delete("{$this->getTable()}_collection");
-        Cache::delete("{$this->getTable()}_options");
+        Cache::delPattern("{$this->getTable()}_options*");
         Cache::delPattern("{$this->getTable()}_search*");
     }
 
@@ -196,7 +196,8 @@ abstract class NewModelBase extends Model
     protected function beforeDelete(): void
     {
         Cache::delete("{$this->getTable()}_{$this->external_id}");
-        Cache::delete("{$this->getTable()}_search*");
+        Cache::delPattern("{$this->getTable()}_options*");
+        Cache::delPattern("{$this->getTable()}_search*");
     }
 
     /**

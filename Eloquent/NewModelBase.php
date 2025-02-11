@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
+use Astrotech\Core\Laravel\AuthGuardian\AuthGuardianUser;
+use DateInvalidTimeZoneException;
+use DateMalformedStringException;
+use DateTime;
+use DateTimeZone;
+use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
@@ -139,6 +145,11 @@ abstract class NewModelBase extends Model
             if (is_null($value)) {
                 continue;
             }
+
+            if (isset($this->rules[$fieldName]) && in_array('date', $this->rules[$fieldName])) {
+                continue;
+            }
+
             $this->setAttribute($fieldName, $value);
         }
 
@@ -159,7 +170,37 @@ abstract class NewModelBase extends Model
             return json_decode($value, true);
         }
 
+        if (isset($this->rules[$key]) && in_array('date', $this->rules[$key]) && !empty($value)) {
+            if ($value instanceof Carbon) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+
+            $date = new DateTime($value, new DateTimeZone(config('app.timezone')));
+            $date->setTimezone(new DateTimeZone($this->getUserTimezone()));
+            return $date->format('Y-m-d H:i:s');
+        }
+
         return parent::getAttribute($key);
+    }
+
+    protected function getUserTimezone(): string
+    {
+        if (!Auth::check()) {
+            return config('app.timezone');
+        }
+
+        /** @var AuthGuardianUser $user */
+        $user = Auth::user();
+
+        if (isset($user->timezone)) {
+            return $user->timezone;
+        }
+
+        if (isset($user->extraFields['timezone'])) {
+            return $user->extraFields['timezone'];
+        }
+
+        return config('app.timezone');
     }
 
     /**
@@ -491,10 +532,12 @@ abstract class NewModelBase extends Model
      * It also sets the 'UPDATED_AT' attribute to the current date and time.
      *
      * @return void
+     * @throws DateInvalidTimeZoneException
+     * @throws DateMalformedStringException
      */
     protected function populateTimestampsColumns(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new DateTimeImmutable("now", new DateTimeZone(config('app.timezone')));
 
         if (!$this->exists && $this->hasModelAttribute(static::CREATED_AT)) {
             $this->{static::CREATED_AT} = $now->format('Y-m-d H:i:s');

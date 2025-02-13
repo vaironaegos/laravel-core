@@ -53,6 +53,7 @@ final class AuthGuardianMiddleware
             $request->headers->set('X-User-Id', $userInfo['data']['id']);
             $request->headers->set('X-User-Name', $userInfo['data']['name']);
             $request->headers->set('X-User-Login', $userInfo['data']['login']);
+            $request->headers->set('X-User-Timezone', $userInfo['data']['timezone']);
             $request->headers->set('X-Group-Id', $userInfo['data']['group']['id']);
             $request->headers->set('X-Group-Is-Admin', $userInfo['data']['group']['isAdmin'] ? '1' : '0');
             $request->headers->set('X-Group-Permissions', $userInfo['data']['group']['permissions']);

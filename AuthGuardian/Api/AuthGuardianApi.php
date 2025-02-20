@@ -146,4 +146,19 @@ final class AuthGuardianApi
             ]
         ]);
     }
+
+    public function impersonate(string $login, string $token, Request $request): array
+    {
+        return $this->executeRequest('POST', $this->baseUrl . '/oauth/token', [
+            'json' => [
+                'grantType' => 'impersonate',
+                'login' => $login,
+            ],
+            'headers' => [
+                ...$this->headers,
+                'Origin' => $request->header('Origin'),
+                'Authorization' => "Bearer {$token}",
+            ],
+        ]);
+    }
 }

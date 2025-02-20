@@ -55,7 +55,7 @@ final class AuthGuardianApi
     {
         return $this->executeRequest('POST', $this->baseUrl . '/oauth/token', [
             'json' => [
-                'grant_type' => 'client_credentials',
+                'grantType' => 'client_credentials',
                 'login' => $login,
                 'password' => $password,
             ],

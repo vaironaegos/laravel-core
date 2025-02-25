@@ -7,6 +7,7 @@ namespace Astrotech\Core\Laravel\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 final class Cors
 {
@@ -69,7 +70,7 @@ final class Cors
 
         $response = $next($request);
 
-        if ($response instanceof StreamedResponse) {
+        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
             $response->headers->set('Access-Control-Allow-Methods', "PUT, PATCH, HEADERS, POST, DELETE, GET, OPTIONS");
             $response->headers->set('Access-Control-Allow-Credentials', "true");

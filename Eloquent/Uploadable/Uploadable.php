@@ -104,17 +104,25 @@ trait Uploadable
             list(, $base64data) = explode(',', $base64data);
         }
 
-        if (
-            base64_decode($base64data, true) === false
-            || base64_encode(base64_decode($base64data)) !== $base64data
-        ) {
-            throw new ValidationException(["field" => $field, "error" => 'invalidBase64']);
-        }
-
-        $fileBinaryData = base64_decode($base64data);
-
         $tmpFileName = tempnam(sys_get_temp_dir(), 'base64-image');
-        file_put_contents($tmpFileName, $fileBinaryData);
+        $handle = fopen($tmpFileName, 'wb');
+
+        $chunkSize = 1024 * 1024; //1MB
+        $offset = 0;
+        $length = strlen($base64data);
+
+        while ($offset < $length) {
+            $chunk = substr($base64data, $offset, $chunkSize);
+            $decodedChunk = base64_decode($chunk);
+            if ($decodedChunk === false) {
+                fclose($handle);
+                unlink($tmpFileName);
+                throw new ValidationException(["field" => $field, "error" => 'invalidBase64']);
+            }
+            fwrite($handle, $decodedChunk);
+            $offset += $chunkSize;
+        }
+        fclose($handle);
 
         $tmpFileObject = new File($tmpFileName);
 

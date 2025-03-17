@@ -27,4 +27,40 @@ trait Sorteable
             $query->orderBy($columnName, "ASC");
         }
     }
+
+    public function processSortData(array &$data, string $sort = ''): void
+    {
+        if (empty($sort)) {
+            return;
+        }
+
+        $keys = explode(',', $sort);
+        foreach ($keys as $key) {
+            $isDesc = false;
+
+            if (str_contains($key, '-')) {
+                $key = explode('-', $key)[1];
+                $isDesc = true;
+            }
+
+            $column = array_column($data, $key);
+
+            if (str_contains($key, '.')) {
+                $nestedKeys = explode('.', $key);
+                $column = array_map(function ($item) use ($nestedKeys) {
+                    $value = $item;
+                    foreach ($nestedKeys as $nestedKey) {
+                        $value = $value[$nestedKey] ?? null;
+                    }
+                    return $value;
+                }, $data);
+            }
+
+            array_multisort(
+                $column,
+                $isDesc ? SORT_DESC : SORT_ASC,
+                $data
+            );
+        }
+    }
 }

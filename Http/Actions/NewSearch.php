@@ -47,6 +47,7 @@ trait NewSearch
         $this->processSearch($query, $request->get('filter', []));
         $this->processSort($query, $request->input('sort', ''));
         $this->buildPagination($query, (int)$request->input('perPage', 40), $method);
+        $this->processSortData($this->data, $request->input('sortData', ''));
 
         $response = $this->answerSuccess($this->data, [
             'pagination' => $this->paginationData

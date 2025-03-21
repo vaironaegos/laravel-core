@@ -6,9 +6,12 @@ namespace Astrotech\Core\Laravel\Eloquent;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Astrotech\Core\Laravel\Utils\KeyCaseConverter;
 
 trait Sorteable
 {
+    use KeyCaseConverter;
+
     public function processSort(Builder $query, string $sort = ''): void
     {
         if (empty($sort)) {
@@ -34,6 +37,8 @@ trait Sorteable
             return;
         }
 
+        $camelCaseData = $this->convert('camel', $data);
+
         $keys = explode(',', $sort);
         foreach ($keys as $key) {
             $isDesc = false;
@@ -43,7 +48,7 @@ trait Sorteable
                 $isDesc = true;
             }
 
-            $column = array_column($data, $key);
+            $column = array_column($camelCaseData, $key);
 
             if (str_contains($key, '.')) {
                 $nestedKeys = explode('.', $key);
@@ -53,7 +58,11 @@ trait Sorteable
                         $value = $value[$nestedKey] ?? null;
                     }
                     return $value;
-                }, $data);
+                }, $camelCaseData);
+            }
+
+            if (empty($column)) {
+                continue;
             }
 
             array_multisort(

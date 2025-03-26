@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\AuthGuardian\Api;
 
+use App\Shared\Service\OutputData;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client as GuzzleClient;
 
@@ -159,6 +160,43 @@ final class AuthGuardianApi
                 'Origin' => $request->header('Origin'),
                 'Authorization' => "Bearer {$token}",
             ],
+        ]);
+    }
+
+    public function requestResetPassword(string $login, Request $request, bool $ignoreMail = false): array
+    {
+        $url = $this->baseUrl . '/users/reset-password-request';
+        if ($ignoreMail) {
+            $url .= '?ignoreMail=1';
+        }
+
+        return $this->executeRequest('POST', $url, [
+            'json' => [
+                'login' => $login,
+            ],
+            'auth' => [$this->clientId, $this->clientSecret],
+            'headers' => [
+                ...$this->headers,
+                'Origin' => $request->header('Origin'),
+            ]
+        ]);
+    }
+
+    public function changePassword(
+        string $passwordResetToken,
+        string $password,
+        Request $request
+    ): array {
+        return $this->executeRequest('PUT', $this->baseUrl . '/users/change-password', [
+           'json' => [
+               'token' => $passwordResetToken,
+               'password' => $password,
+           ],
+            'auth' => [$this->clientId, $this->clientSecret],
+            'headers' => [
+                ...$this->headers,
+                'Origin' => $request->header('Origin'),
+            ]
         ]);
     }
 }

@@ -153,12 +153,12 @@ abstract class NewModelBase extends Model
             $this->setAttribute($fieldName, $value);
         }
 
-        if (!empty($this->getAttribute('id'))) {
+        if (!empty($this->getAttribute($this->primaryKey))) {
             return;
         }
 
         if ($this->hasExternalId && !$this->external_id) {
-            $this->external_id = Uuid::uuid4()->toString();
+            $this->external_id = Uuid::uuid7()->toString();
         }
     }
 
@@ -192,12 +192,12 @@ abstract class NewModelBase extends Model
         /** @var AuthGuardianUser $user */
         $user = Auth::user();
 
-        if (isset($user->timezone)) {
-            return $user->timezone;
+        if (!empty($user->getAttribute('timezone'))) {
+            return $user->getAttribute('timezone');
         }
 
-        if (isset($user->extraFields['timezone'])) {
-            return $user->extraFields['timezone'];
+        if (isset($user->getAttribute('extraFields')['timezone'])) {
+            return $user->getAttribute('extraFields')['timezone'];
         }
 
         return config('app.timezone');
@@ -297,7 +297,7 @@ abstract class NewModelBase extends Model
      */
     public function addFillable(array $fillable): void
     {
-        $this->fillable = array_merge(['id', 'external_id'], $fillable);
+        $this->fillable = array_merge(['external_id'], $fillable);
     }
 
     /**
@@ -351,7 +351,7 @@ abstract class NewModelBase extends Model
      */
     public function addCast(array $casts): void
     {
-        $this->casts['id'] = UuidToIdCast::class . ":{$this->getTable()}";
+        $this->casts[$this->primaryKey] = UuidToIdCast::class . ":{$this->getTable()}";
 
         if ($this->hasModelAttribute('active')) {
             $this->casts['active'] = 'boolean';
@@ -468,11 +468,11 @@ abstract class NewModelBase extends Model
             $data[$fieldName] = $this->getAttribute($fieldName);
         }
 
-        $data['id'] = $data['external_id'] ?? null;
+        $data[$this->primaryKey] = $data['external_id'] ?? null;
         unset($data['external_id'], $data['deleted_at'], $data['deleted_by']);
 
         foreach ($this->getCasts() as $fieldName => $castName) {
-            if ($fieldName === 'id') {
+            if ($fieldName === $this->primaryKey) {
                 continue;
             }
 
@@ -496,7 +496,7 @@ abstract class NewModelBase extends Model
      */
     public function toSoftArray(): array
     {
-        return $this->returnOnlyFields(['id']);
+        return $this->returnOnlyFields([$this->primaryKey]);
     }
 
     /**
@@ -562,7 +562,7 @@ abstract class NewModelBase extends Model
         $blameName = 'anonymous';
 
         if ($user) {
-            $blameName = "{$user->getAttribute('name')} [{$user->external_id}]";
+            $blameName = "{$user->getAttribute('name')} [{$user->getAttribute('external_id')}]";
         }
 
         if (!$this->exists && $this->hasModelAttribute(self::CREATED_BY)) {
@@ -679,7 +679,9 @@ abstract class NewModelBase extends Model
     public static function getIdFromExternalId(string $externalId): ?int
     {
         $model = new static();
-        $query = $model->select('id')->where('external_id', $externalId);
+        $query = $model
+            ->select($model->primaryKey)
+            ->where('external_id', $externalId);
 
         if ($model->hasModelAttribute('deleted_at')) {
             $query->whereNull('deleted_at');

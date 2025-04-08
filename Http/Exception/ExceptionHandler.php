@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Exception;
 
+use Astrotech\Core\Laravel\Http\HttpStatus;
 use Throwable;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Astrotech\Core\Base\Exception\ExceptionBase;
 use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
+use Astrotech\Core\Base\Exception\ValidationException as AppValidationException;
 
 class ExceptionHandler extends LaravelHandlerException
 {
@@ -62,26 +64,6 @@ class ExceptionHandler extends LaravelHandlerException
 
         $request->headers->set('Accept', 'application/json');
 
-        if ($e instanceof ExceptionBase) {
-            $response = [
-                'status' => 'fail',
-                'data' => $e->details(),
-                'meta' => [
-                    'message' => $e->getMessage(),
-                    'trace' => !$isProduction ? $e->getTrace() : []
-                ],
-            ];
-
-            if ($isProduction) {
-                $logSystem->error($e->getMessage(), [
-                    'category' => get_class($e),
-                    'extraData' => $response
-                ]);
-            }
-
-            return response()->json($response)->setStatusCode($e->getStatusCode());
-        }
-
         if ($e instanceof QueryException) {
             $response = [
                 'status' => 'error',
@@ -130,6 +112,41 @@ class ExceptionHandler extends LaravelHandlerException
             }
 
             return response()->json($response)->setStatusCode($e->status);
+        }
+
+        if ($e instanceof AppValidationException) {
+            $response = [
+                'status' => 'fail',
+                'data' => $e->details(),
+                'meta' => [
+                    'message' => $e->getMessage(),
+                    'trace' => !$isProduction ? $e->getTrace() : []
+                ],
+            ];
+
+            return response()->json($response)->setStatusCode(HttpStatus::BAD_REQUEST->value);
+        }
+
+        if ($e instanceof ExceptionBase) {
+            $response = [
+                'status' => 'fail',
+                'data' => $e->details(),
+                'meta' => [
+                    'message' => $e->getMessage(),
+                    'trace' => !$isProduction ? $e->getTrace() : []
+                ],
+            ];
+
+            if ($isProduction) {
+                $logSystem->error($e->getMessage(), [
+                    'category' => get_class($e),
+                    'extraData' => $response
+                ]);
+            }
+
+            return response()
+                ->json($response)
+                ->setStatusCode(HttpStatus::INTERNAL_SERVER_ERROR->value);
         }
 
         $response = [

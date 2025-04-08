@@ -1,6 +1,6 @@
 <?php
 
-namespace Astrotech\Core\Laravel\Casts;
+namespace Astrotech\Core\Laravel\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 

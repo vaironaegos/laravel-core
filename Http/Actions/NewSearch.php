@@ -42,9 +42,10 @@ trait NewSearch
             $query->whereNull(['deleted_at', 'deleted_by']);
         }
 
-        $this->modifySearchQuery($query);
+        $filters = $request->get('filter', []);
+        $this->modifySearchQuery($query, $filters);
 
-        $this->processSearch($query, $request->get('filter', []));
+        $this->processSearch($query, $filters);
         $this->processSort($query, $request->input('sort', ''));
         $this->buildPagination($query, (int)$request->input('perPage', 40), $method);
         $this->processSortData($this->data, $request->input('sortData', ''));
@@ -58,7 +59,7 @@ trait NewSearch
         return $response;
     }
 
-    protected function modifySearchQuery(Builder $query): void
+    protected function modifySearchQuery(Builder $query, array &$filters = []): void
     {
     }
 }

@@ -199,4 +199,16 @@ final class AuthGuardianApi
             ]
         ]);
     }
+
+    public function getIdentity(string $token, Request $request): array
+    {
+        $this->addHeader('Authorization', "Bearer $token");
+        $this->addHeader('Origin', $request->header('Origin'));
+
+        return $this->executeRequest('GET', $this->baseUrl . "/users/identity", [
+            'headers' => [
+                ...$this->headers,
+            ]
+        ]);
+    }
 }

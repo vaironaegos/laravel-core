@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
  * @property string $name
  * @property string $email
  * @property string $login
+ * @property array $extraFields
  * @property array $group
  * @property array $permissions
  */

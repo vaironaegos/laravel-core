@@ -297,7 +297,7 @@ abstract class NewModelBase extends Model
      */
     public function addFillable(array $fillable): void
     {
-        $this->fillable = array_merge(['external_id'], $fillable);
+        $this->fillable = array_merge(['external_id', 'id'], $fillable);
     }
 
     /**

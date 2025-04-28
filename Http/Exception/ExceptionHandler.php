@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Exception;
 
-use Astrotech\Core\Laravel\Http\HttpStatus;
 use Throwable;
 use Illuminate\Database\QueryException;
+use GuzzleHttp\Exception\RequestException;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 use Illuminate\Validation\ValidationException;
 use Astrotech\Core\Base\Exception\ExceptionBase;
 use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
@@ -112,6 +113,14 @@ class ExceptionHandler extends LaravelHandlerException
             }
 
             return response()->json($response)->setStatusCode($e->status);
+        }
+
+        if ($e instanceof RequestException) {
+            return response()->json([
+                'status' => 'fail',
+                'data' => json_decode($e->getResponse()->getBody()->getContents(), true),
+                'message' => $e->getMessage()
+            ], $e->getResponse()->getStatusCode());
         }
 
         if ($e instanceof AppValidationException) {

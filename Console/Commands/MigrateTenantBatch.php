@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Console\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Command\Command;
+use Illuminate\Console\Command as CommandController;
 
-final class MigrateTenantBatch extends Command
+final class MigrateTenantBatch extends CommandController
 {
     protected $signature = 'schema:migrate-batch';
     protected $description = 'Run migrations for all registered tenants';
 
-    public function handle(): void
+    public function handle(): int
     {
         $tenants = DB::table('public.tenants')
             ->select(['schema'])
@@ -20,11 +22,23 @@ final class MigrateTenantBatch extends Command
             ->get();
 
         foreach ($tenants as $tenant) {
-            $this->info("=========== Running migrations for tenant '{$tenant->schema}' ===========");
-            $this->call('schema:migrate', ['schema' => $tenant->schema, '--force' => true]);
-            $this->info("Done!");
+            DB::purge('pgsql');
             $this->info("=========================================================================");
-            sleep(1);
+            $this->info("=========== Running migrations for tenant '{$tenant->schema}' ===========");
+            $this->info("=========================================================================");
+
+            $process = new Process([
+                'php', 'artisan', 'schema:migrate', $tenant->schema, '--force'
+            ]);
+
+            $process->run(function ($type, $buffer) {
+                echo $buffer;
+            });
+
+            $this->info("Done!");
+            sleep(2);
         }
+
+        return Command::SUCCESS;
     }
 }

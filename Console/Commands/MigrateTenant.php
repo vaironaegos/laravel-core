@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Console\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Command\Command;
+use Illuminate\Console\Command as CommandController;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-final class MigrateTenant extends Command
+final class MigrateTenant extends CommandController
 {
     protected $signature = 'schema:migrate {schema} {connection=pgsql} {--fresh} {--force}';
     protected $description = 'Run migrations for a specific tenant schema';
 
-    public function handle(): void
+    public function handle(): int
     {
         $schema = $this->argument('schema');
         $connection = $this->argument('connection');
@@ -58,10 +59,10 @@ final class MigrateTenant extends Command
 
         $this->info('Running migrations for schema: ' . $schema);
         $output = new BufferedOutput();
-        DB::connection($connection)->statement('SET search_path TO "' . $schema . '"');
         Artisan::call('migrate', $options, $output);
-        DB::connection($connection)->statement('SET search_path TO "' . $schema . '"');
         $this->info($output->fetch());
         $this->info('Migrations completed for schema: ' . $schema);
+
+        return Command::SUCCESS;
     }
 }

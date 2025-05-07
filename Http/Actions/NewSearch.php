@@ -45,8 +45,11 @@ trait NewSearch
         $filters = $request->get('filter', []);
         $this->modifySearchQuery($query, $filters);
 
+        $sort = $request->input('sort', '');
+        $this->modifySortQuery($query, $sort);
+
+        $this->processSort($query, $sort);
         $this->processSearch($query, $filters);
-        $this->processSort($query, $request->input('sort', ''));
         $this->buildPagination($query, (int)$request->input('perPage', 40), $method);
         $this->processSortData($this->data, $request->input('sortData', ''));
 
@@ -60,6 +63,10 @@ trait NewSearch
     }
 
     protected function modifySearchQuery(Builder $query, array &$filters = []): void
+    {
+    }
+
+    protected function modifySortQuery(Builder $query, string &$sort = ''): void
     {
     }
 }

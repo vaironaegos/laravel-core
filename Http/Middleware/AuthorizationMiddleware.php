@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Http\Middleware;
 
-use Astrotech\Core\Base\Exception\ValidationException;
-use Astrotech\Core\Laravel\Http\HttpStatus;
 use Closure;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 use Firebase\JWT\SignatureInvalidException;
+use Astrotech\Core\Base\Exception\ValidationException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 final class AuthorizationMiddleware
@@ -39,7 +38,7 @@ final class AuthorizationMiddleware
 
             $token = trim(explode(' ', $token)[1]);
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
-            $user = User::firstWhere('id', Uuid::fromString($payload->sub)->getBytes());
+            $user = User::firstWhere('external_id', $payload->sub);
 
             if (!$user) {
                 return response()->json(['status' => 'User not found'], 404);

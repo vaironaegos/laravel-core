@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Astrotech\Core\Laravel\Eloquent;
 
-use Astrotech\Core\Laravel\AuthGuardian\AuthGuardianUser;
-use DateInvalidTimeZoneException;
-use DateMalformedStringException;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use DateInvalidTimeZoneException;
+use DateMalformedStringException;
 use Illuminate\Support\Facades\Auth;
 use Astrotech\Core\Laravel\Utils\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -189,15 +188,11 @@ abstract class NewModelBase extends Model
             return config('app.timezone');
         }
 
-        /** @var AuthGuardianUser $user */
+        /** @var NewModelBase $user */
         $user = Auth::user();
 
         if (!empty($user->getAttribute('timezone'))) {
             return $user->getAttribute('timezone');
-        }
-
-        if (isset($user->getAttribute('extraFields')['timezone'])) {
-            return $user->getAttribute('extraFields')['timezone'];
         }
 
         return config('app.timezone');

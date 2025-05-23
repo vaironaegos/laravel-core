@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Http\Response;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 use Astrotech\Core\Laravel\Http\HttpStatus;
 
 /**
@@ -32,13 +33,21 @@ trait AnswerTrait
         return Answer::success($data, $meta, $code);
     }
 
-    public function answerFail($data, array $meta = [], HttpStatus $code = HttpStatus::BAD_REQUEST)
+    public function answerFail($data, array $meta = [], HttpStatus $code = HttpStatus::BAD_REQUEST): JsonResponse
     {
         return Answer::fail($data, $meta, $code);
     }
 
-    public function answerError($message, HttpStatus $code = HttpStatus::INTERNAL_SERVER_ERROR, $data = null)
-    {
+    public function answerError(
+        $message,
+        HttpStatus $code = HttpStatus::INTERNAL_SERVER_ERROR,
+        $data = null
+    ): JsonResponse {
         return Answer::error($message, $code, $data);
+    }
+
+    public function answerNoContent(HttpStatus $code = HttpStatus::NO_CONTENT): JsonResponse
+    {
+        return Response::json([], $code->value);
     }
 }

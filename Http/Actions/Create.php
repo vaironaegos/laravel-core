@@ -6,6 +6,7 @@ namespace Astrotech\Core\Laravel\Http\Actions;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Astrotech\Core\Laravel\Http\HttpStatus;
 use Astrotech\Core\Base\Exception\RuntimeException;
 use Astrotech\Core\Laravel\Eloquent\Uploadable\InputData;
 
@@ -51,6 +52,9 @@ trait Create
         $record->save();
         $this->afterSave($record);
 
-        return $this->answerSuccess($record->toSoftArray());
+        return $this->answerSuccess(
+            data: $record->toSoftArray(),
+            code: HttpStatus::CREATED
+        );
     }
 }

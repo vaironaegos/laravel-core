@@ -19,7 +19,7 @@ final class ResponseToCamelCase
         /** @var Response $response */
         $response = $next($request);
 
-        if ($response instanceof JsonResponse) {
+        if ($response instanceof JsonResponse && !empty($response->content())) {
             $response->setData($this->convert('camel', json_decode($response->content(), true)));
         }
 

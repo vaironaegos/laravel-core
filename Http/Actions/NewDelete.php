@@ -17,7 +17,8 @@ trait NewDelete
     public function delete(Request $request, string $id): JsonResponse
     {
         $modelName = $this->modelClassName();
-        $query = $modelName::where('external_id', $id)
+        $query = $modelName::query()
+            ->where('external_id', $id)
             ->whereNull('deleted_at')
             ->whereNull('deleted_by');
 
@@ -47,7 +48,7 @@ trait NewDelete
         $this->afterSave($record);
         $this->afterSoftDelete($record);
 
-        return $this->answerSuccess($record->toSoftArray());
+        return $this->answerNoContent();
     }
 
     protected function modifyDeleteQuery(Builder $query): void

@@ -133,7 +133,9 @@ class ExceptionHandler extends LaravelHandlerException
                 ],
             ];
 
-            return response()->json($response)->setStatusCode(HttpStatus::BAD_REQUEST->value);
+            return response()
+                ->json($response)
+                ->setStatusCode(HttpStatus::BAD_REQUEST->value);
         }
 
         if ($e instanceof ExceptionBase) {
@@ -176,6 +178,8 @@ class ExceptionHandler extends LaravelHandlerException
             ]);
         }
 
-        return response()->json($response)->setStatusCode(400);
+        return response()
+            ->json($response)
+            ->setStatusCode(HttpStatus::INTERNAL_SERVER_ERROR->value);
     }
 }

@@ -19,12 +19,12 @@ final class AuthorizationMiddleware
 {
     /**
      * Handle an incoming request.
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param Closure $next
      * @return mixed
      * @throws ValidationException
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         try {
             $token = $request->headers->get('Authorization');
@@ -41,16 +41,16 @@ final class AuthorizationMiddleware
             $user = User::firstWhere('external_id', $payload->sub);
 
             if (!$user) {
-                return response()->json(['status' => 'User not found'], 404);
+                return response()->json(['status' => 'User not found'], HttpStatus::NOT_FOUND->value);
             }
 
             auth('api')->login($user);
         } catch (SignatureInvalidException $e) {
-            return response()->json(['status' => 'Invalid Signature'], 403);
+            return response()->json(['status' => 'Invalid Signature'], HttpStatus::UNAUTHORIZED->value);
         } catch (TokenExpiredException $e) {
-            return response()->json(['status' => 'Token is Expired'], 403);
+            return response()->json(['status' => 'Token is Expired'], HttpStatus::UNAUTHORIZED->value);
         } catch (UnexpectedValueException $e) {
-            return response()->json(['status' => 'Token is Invalid'], 403);
+            return response()->json(['status' => 'Token is Invalid'], HttpStatus::UNAUTHORIZED->value);
         }
 
         return $next($request);

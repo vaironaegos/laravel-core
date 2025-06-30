@@ -106,7 +106,10 @@ abstract class NewModelBase extends Model
                 $details[] = ['field' => $field, 'error' => $message, 'value' => $value];
             }
 
-            throw new ValidationException($details, 'Validation error in model "' . $model::class . '"');
+            throw new ValidationException(
+                $details,
+                'Validation error in model "' . $model::class . '": ' . json_encode($details, JSON_PRETTY_PRINT)
+            );
         };
 
         $afterSaveCallback = function (self $model) {

@@ -38,19 +38,34 @@ final class AuthorizationMiddleware
 
             $token = trim(explode(' ', $token)[1]);
             $payload = JWT::decode($token, new Key(config('jwt.keys.public'), config('jwt.algo')));
-            $user = User::firstWhere('external_id', $payload->sub);
+            $user = User::query()->firstWhere('external_id', $payload->sub);
 
             if (!$user) {
-                return response()->json(['status' => 'User not found'], HttpStatus::NOT_FOUND->value);
+                throw new ValidationException(
+                    details: ['error' => 'userNotFound'],
+                    code: HttpStatus::UNAUTHORIZED->value
+                );
             }
 
             auth('api')->login($user);
         } catch (SignatureInvalidException $e) {
-            return response()->json(['status' => 'Invalid Signature'], HttpStatus::UNAUTHORIZED->value);
+            throw new ValidationException(
+                details: ['error' => 'invalidSignature'],
+                message: $e->getMessage(),
+                code: HttpStatus::UNAUTHORIZED->value
+            );
         } catch (TokenExpiredException $e) {
-            return response()->json(['status' => 'Token is Expired'], HttpStatus::UNAUTHORIZED->value);
+            throw new ValidationException(
+                details: ['error' => 'tokenExpired'],
+                message: $e->getMessage(),
+                code: HttpStatus::UNAUTHORIZED->value
+            );
         } catch (UnexpectedValueException $e) {
-            return response()->json(['status' => 'Token is Invalid'], HttpStatus::UNAUTHORIZED->value);
+            throw new ValidationException(
+                details: ['error' => 'invalidToken'],
+                message: $e->getMessage(),
+                code: HttpStatus::UNAUTHORIZED->value
+            );
         }
 
         return $next($request);

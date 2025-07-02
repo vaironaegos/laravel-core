@@ -14,6 +14,9 @@ use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
 use Astrotech\Core\Base\Exception\ValidationException as AppValidationException;
 
+use function Sentry\init;
+use function Sentry\captureException;
+
 class ExceptionHandler extends LaravelHandlerException
 {
     /**
@@ -59,9 +62,19 @@ class ExceptionHandler extends LaravelHandlerException
 
     public function render($request, Throwable $e)
     {
+        $sentryIsEnabled = filled(config('services.sentry.dsn'));
+
+        if ($sentryIsEnabled) {
+            init([
+                'dsn' => config('services.sentry.dsn'),
+                'environment' => config('app.env'),
+            ]);
+        }
+
         /** @var LogSystem $logSystem */
         $logSystem = app()->make(LogSystem::class);
         $isProduction = app()->environment('production');
+        $isDevelopment = app()->environment('local');
 
         $request->headers->set('Accept', 'application/json');
 
@@ -75,6 +88,10 @@ class ExceptionHandler extends LaravelHandlerException
                     'trace' => !$isProduction ? $e->getTrace() : []
                 ],
             ];
+
+            if ($sentryIsEnabled && !$isDevelopment) {
+                captureException($e);
+            }
 
             if ($isProduction) {
                 $logSystem->error($e->getMessage(), [
@@ -116,6 +133,10 @@ class ExceptionHandler extends LaravelHandlerException
         }
 
         if ($e instanceof RequestException) {
+            if ($sentryIsEnabled && !$isDevelopment) {
+                captureException($e);
+            }
+
             return response()->json([
                 'status' => 'fail',
                 'data' => json_decode($e->getResponse()->getBody()->getContents(), true),
@@ -148,6 +169,10 @@ class ExceptionHandler extends LaravelHandlerException
                 ],
             ];
 
+            if ($sentryIsEnabled && !$isDevelopment) {
+                captureException($e);
+            }
+
             if ($isProduction) {
                 $logSystem->error($e->getMessage(), [
                     'category' => get_class($e),
@@ -170,6 +195,10 @@ class ExceptionHandler extends LaravelHandlerException
                 'trace' => !$isProduction ? $e->getTrace() : []
             ],
         ];
+
+        if ($sentryIsEnabled && !$isDevelopment) {
+            captureException($e);
+        }
 
         if ($isProduction) {
             $logSystem->error($e->getMessage(), [

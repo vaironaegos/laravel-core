@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 final class MigrateTenant extends CommandController
 {
-    protected $signature = 'schema:migrate {schema} {connection=pgsql} {--fresh} {--force}';
+    protected $signature = 'schema:migrate {schema} {connection=pgsql} {--fresh} {--force} {--rollback}';
     protected $description = 'Run migrations for a specific tenant schema';
 
     public function handle(): int
@@ -47,6 +47,16 @@ final class MigrateTenant extends CommandController
             '--path' => 'database/migrations/tenants',
             '--force' => $this->option('force'),
         ];
+
+        if ($this->option('rollback')) {
+            $this->info('Rollback migrations for schema: ' . $schema);
+            $output = new BufferedOutput();
+            Artisan::call('migrate:rollback', $options, $output);
+            $this->info($output->fetch());
+            $this->info('Migrations rollback successfully for schema: ' . $schema);
+
+            return Command::SUCCESS;
+        }
 
         if ($this->option('fresh')) {
             $this->info("Dropping schema '{$schema}'...");

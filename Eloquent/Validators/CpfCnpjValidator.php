@@ -12,6 +12,10 @@ final class CpfCnpjValidator implements ValidationRule
     {
         $value = trim(preg_replace('/\D/', '', $value));
 
+        if (preg_match('/^(\d)\1*$/', $value)) {
+            return;
+        }
+
         if (strlen($value) === 11 && !$this->validateCpf($value)) {
             $fail('invalidCpf');
             return;

@@ -23,9 +23,14 @@ final class CheckPermissionMiddleware
             return $next($request);
         }
 
-        $moduleName = preg_replace('/[^a-zA-Z]/', '', $moduleName);
+        $moduleName = preg_replace('/[^a-zA-Z\-]/', '', $moduleName);
+
+        if (empty($moduleName)) {
+            $moduleName = explode('/', $request->path())[0];
+        }
+
         $actionName = $actionName !== 'access'
-            ? '.' . preg_replace('/[^a-zA-Z]/', '', $actionName)
+            ? '.' . preg_replace('/[^a-zA-Z\-]/', '', $actionName)
             : '';
 
         $permissionKey = "{$moduleName}.access{$actionName}";

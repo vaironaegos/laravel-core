@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Astrotech\Core\Laravel\Http\Exception;
 
 use Throwable;
+
+use function Sentry\init;
+use function Sentry\captureException;
+
 use Illuminate\Database\QueryException;
 use GuzzleHttp\Exception\RequestException;
 use Astrotech\Core\Laravel\Http\HttpStatus;
@@ -13,9 +17,6 @@ use Astrotech\Core\Base\Exception\ExceptionBase;
 use Astrotech\Core\Base\Adapter\Contracts\LogSystem;
 use Illuminate\Foundation\Exceptions\Handler as LaravelHandlerException;
 use Astrotech\Core\Base\Exception\ValidationException as AppValidationException;
-
-use function Sentry\init;
-use function Sentry\captureException;
 
 class ExceptionHandler extends LaravelHandlerException
 {
@@ -156,7 +157,7 @@ class ExceptionHandler extends LaravelHandlerException
 
             return response()
                 ->json($response)
-                ->setStatusCode(HttpStatus::BAD_REQUEST->value);
+                ->setStatusCode($e->getStatusCode());
         }
 
         if ($e instanceof ExceptionBase) {

@@ -498,6 +498,21 @@ abstract class NewModelBase extends Model
     }
 
     /**
+     * Convert the current entity instance into an array representation.
+     *
+     * @return array The entity attributes as an associative array,
+     * with `id` set to the value of `external_id`.
+     */
+    public function toArrayEntity(): array
+    {
+        $attributes = $this->getAttributes();
+        $attributes['id'] = $this->external_id;
+        unset($attributes['external_id']);
+
+        return $attributes;
+    }
+
+    /**
      * Checks if the model has been softly deleted.
      *
      * @return bool

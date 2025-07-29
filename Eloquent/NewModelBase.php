@@ -179,6 +179,14 @@ abstract class NewModelBase extends Model
 
             $date = new DateTime($value, new DateTimeZone(config('app.timezone')));
             $date->setTimezone(new DateTimeZone($this->getUserTimezone()));
+
+            $valueWithMs = $date->format("Y-m-d H:i:s.u");
+            [, $time] = explode(' ', $valueWithMs);
+
+            if ($time === '00:00:00.000000') {
+                return $date->format('Y-m-d');
+            }
+
             return $date->format('Y-m-d H:i:s');
         }
 

@@ -151,7 +151,7 @@ class ExceptionHandler extends LaravelHandlerException
                 'data' => $e->details(),
                 'meta' => [
                     'message' => $e->getMessage(),
-                    'trace' => !$isProduction ? $e->getTrace() : []
+                    'trace' => !$isProduction ? $e->getTraceAsString() : []
                 ],
             ];
 

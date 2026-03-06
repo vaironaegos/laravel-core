@@ -6,8 +6,6 @@ namespace Astrotech\Core\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 final class Cors
 {
@@ -15,25 +13,21 @@ final class Cors
     {
         $origin = $request->headers->get('Origin');
 
-        $allowedOrigins = [
-            'http://localhost:5173',
-            'http://localhost:3000',
-            'http://localhost',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:5173',
-            'http://127.0.0.1',
-        ];
+        if (config('app.env') === 'production') {
+            $allowedOrigins = [$origin];
 
-        if (config('app.cors.allowed_origins') !== null) {
-            $allowedOrigins = array_merge($allowedOrigins, config('app.cors.allowed_origins'));
+            if (config('app.cors.allowed_origins') !== null) {
+                $allowedOrigins = config('app.cors.allowed_origins');
+            }
+
+            if (!$origin || !in_array($origin, $allowedOrigins)) {
+                return response()->json(['error' => 'originNotAllowed', 'origin' => $origin], 403);
+            }
         }
 
+        // For non-production environments, use Origin header or wildcard
         if (!$origin) {
-            return response()->json(['error' => 'undefinedOriginHeader'], 403);
-        }
-
-        if (!in_array($origin, $allowedOrigins)) {
-            return response()->json(['error' => 'originNotAllowed', 'origin' => $origin], 403);
+            $origin = '*';
         }
 
         $allowedHeaders = [
@@ -48,12 +42,11 @@ final class Cors
             "Origin",
             "User-Agent",
             "X-Requested-With",
+            "X-Csrf-Token",
+            "X-Test-Session-Id",
             "Bearer",
             "Device",
             "Context",
-            "Context-Secondary",
-            "PrivateToken",
-            "Meta"
         ];
 
         $exposedHeaders = [
@@ -62,31 +55,31 @@ final class Cors
             "Authorization",
             "Bearer",
             "Device",
-            "Context",
-            "Context-Secondary",
-            "PrivateToken",
-            "Meta"
         ];
 
-        $response = $next($request);
-
-        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
+        // Handle preflight OPTIONS requests immediately
+        if ($request->getMethod() === 'OPTIONS') {
+            $response = response('', 204);
             $response->headers->set('Access-Control-Allow-Origin', $origin);
-            $response->headers->set('Access-Control-Allow-Methods', "PUT, PATCH, HEADERS, POST, DELETE, GET, OPTIONS");
-            $response->headers->set('Access-Control-Allow-Credentials', "true");
-            $response->headers->set('Access-Control-Expose-Headers', implode(",", $exposedHeaders));
+            $response->headers->set('Access-Control-Allow-Methods', 'PUT, PATCH, POST, DELETE, GET, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', implode(',', $allowedHeaders));
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+            $response->headers->set('Access-Control-Max-Age', '86400');
+
+            $response->headers->remove('Server');
+            $response->headers->remove('X-Powered-By');
+
             return $response;
         }
 
-        $response->header('Access-Control-Allow-Origin', $origin)
-            ->header('Access-Control-Allow-Methods', "PUT, PATCH, HEADERS, POST, DELETE, GET, OPTIONS")
-            ->header('Access-Control-Allow-Headers', implode(",", $allowedHeaders))
-            ->header('Access-Control-Expose-Headers', implode(",", $exposedHeaders))
-            ->header('Access-Control-Allow-Credentials', "true");
-
-        if ($request->getMethod() === 'OPTIONS') {
-            $response->setStatusCode(204);
-        }
+        $response = $next($request);
+        $response->headers->set('Access-Control-Allow-Origin', $origin);
+        $response->headers->set('Access-Control-Allow-Methods', 'PUT, PATCH, POST, DELETE, GET, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', implode(',', $allowedHeaders));
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        $response->headers->set('Access-Control-Expose-Headers', implode(',', $exposedHeaders));
+        $response->headers->remove('Server');
+        $response->headers->remove('X-Powered-By');
 
         return $response;
     }
